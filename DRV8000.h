@@ -23,7 +23,6 @@
 #define DRV8000_DEVICE_ID_MASK                                  0xFFu
 #define DRV8000_WRITE_ACCESS                                    0u
 #define DRV8000_READ_ACCESS                                     1u
-#define DRV8000_SPI_FRAME_LEN                                   4u /* 24 bits + 8 bits padding = 4 8-bit buffers */
 #define DRV8000_SUCCESS_SPI_STATUS                              0x0u /* 0     0    0     0   0    0         */
                                                                      /* FAULT WARN OV_UV DRV OTSD SPI_ERR   */
 #define DRV8000_MAX_GEN_PWM_DUTYCYCLE                           0x3FFu /* 10-bit */
@@ -32,6 +31,29 @@
 /* **********************************************************************/
 /* ***               Definition of global types                       ***/
 /* **********************************************************************/
+typedef uint8_t (*DRV8000_SPI_Transceive_fptr)(const uint8_t*, uint8_t*, const uint16_t);
+typedef uint16_t (*DRV8000_Pwm_Set_Dutycycle_fptr)(uint8_t, uint8_t, uint16_t);
+typedef void (*DRV8000_Pwm_Set_Period_fptr)(uint8_t, uint8_t, uint16_t);
+typedef void (*DRV8000_Set_Dig_Io_fptr)(uint8_t);
+typedef void (*DRV8000_Delay_fptr)(uint16_t); /* delay in us */
+
+typedef struct
+{
+    DRV8000_SPI_Transceive_fptr         fptr_SpiTransceive;
+    DRV8000_Pwm_Set_Period_fptr         fptr_PwmSetPeriod;
+    DRV8000_Pwm_Set_Dutycycle_fptr      fptr_PwmSetDutycycle;
+    DRV8000_Set_Dig_Io_fptr             fptr_Set_GD_IN1;
+    DRV8000_Set_Dig_Io_fptr             fptr_Set_GD_IN2;
+    DRV8000_Set_Dig_Io_fptr             fptr_Set_nSLEEP;
+    DRV8000_Set_Dig_Io_fptr             fptr_Set_DRVOFF;
+    DRV8000_Delay_fptr                  fptr_Delay;
+    uint16_t pwm_max_period;
+	uint8_t pwm1_instance;
+	uint8_t pwm1_channel;
+	uint8_t pwm2_instance;
+	uint8_t pwm2_channel;
+} st_DRV8000_Interface_t;
+
 typedef union {
     struct {
         uint8_t SPI_ERR         : 1;
@@ -116,5 +138,6 @@ typedef enum {
 
     DRV8000_NUM_OF_REGS		           ,
 } en_REG_ID_t;
+
 
 #endif /* GDU_TI_DRV8000_DRV8000_H_ */
