@@ -47,6 +47,7 @@ typedef struct
     DRV8000_Set_Dig_Io_fptr             fptr_Set_nSLEEP;
     DRV8000_Set_Dig_Io_fptr             fptr_Set_DRVOFF;
     DRV8000_Delay_fptr                  fptr_Delay;
+    uint16_t spi_frame_len;
     uint16_t pwm_max_period;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
@@ -138,6 +139,16 @@ typedef enum {
 
     DRV8000_NUM_OF_REGS		           ,
 } en_REG_ID_t;
+
+
+/* **********************************************************************/
+/* ***               Definition of global variables                   ***/
+/* **********************************************************************/
+
+
+/* **********************************************************************/
+/* ***            Declaration of global functions                     ***/
+/* **********************************************************************/
 
 
 #endif /* GDU_TI_DRV8000_DRV8000_H_ */
