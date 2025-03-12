@@ -115,16 +115,16 @@ typedef enum {
     REGID_EC_HEAT_IT_RIP_STAT          ,
     REGID_HS_STAT                      ,
 /* CONFIG registers */
-    /* REGID_IC_CNFG1                     , */
+    REGID_IC_CNFG1                     ,
     /* REGID_IC_CNFG2                     , */
-    /* REGID_GD_CNFG                      , */
-    /* REGID_GD_IDRV_CNFG                 , */
-    /* REGID_GD_VGS_CNFG                  , */
-    /* REGID_GD_VDS_CNFG                  , */
-    /* REGID_GD_CSA_CNFG                  , */
-    /* REGID_GD_AGD_CNFG                  , */
-    /* REGID_GD_PDR_CNFG                  , */
-    /* REGID_GD_STC_CNFG                  , */
+    REGID_GD_CNFG                      ,
+    REGID_GD_IDRV_CNFG                 ,
+    REGID_GD_VGS_CNFG                  ,
+    REGID_GD_VDS_CNFG                  ,
+    REGID_GD_CSA_CNFG                  ,
+    REGID_GD_AGD_CNFG                  ,
+    REGID_GD_PDR_CNFG                  ,
+    REGID_GD_STC_CNFG                  ,
     /* REGID_HB_ITRIP_DG                  , */
     /* REGID_HB_OUT_CNFG1                 , */
     /* REGID_HB_OUT_CNFG2                 , */
@@ -135,14 +135,14 @@ typedef enum {
     /* REGID_HB_ITRIP_CNFG                , */
     /* REGID_HB_ITRIP_FREQ                , */
     REGID_HS_HEAT_OUT_CNFG             ,
-    /* REGID_HS_OC_CNFG                   , */
-    /* REGID_HS_OL_CNFG                   , */
+    REGID_HS_OC_CNFG                   ,
+    REGID_HS_OL_CNFG                   ,
     REGID_HS_REG_CNFG1                 ,
     REGID_HS_REG_CNFG2                 ,
     REGID_HS_PWM_FREQ_CNFG             ,
     /* REGID_HEAT_CNFG                    , */
     /* REGID_EC_CNFG                      , */
-    /* REGID_HS_OCP_DG                    , */
+    REGID_HS_OCP_DG                    ,
 /* CONTROL registers */
     REGID_IC_CTRL                      ,
     REGID_GD_HB_CTRL                   ,
@@ -185,6 +185,17 @@ uint8_t drv8000_set_pwm_pins(st_DRV8000_Interface_t* interface,
                             );
 
 uint8_t drv8000_reset(st_DRV8000_Interface_t* interface);
+
+/* *** SPI Read *** */
+uint8_t drv8000_status_registers_read(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_control_registers_read(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_register_read(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_spi_read_devid(st_DRV8000_Interface_t* interface);
 
 /* *** SPI Control *** */
 uint8_t drv8000_clear_fault(st_DRV8000_Interface_t* interface);

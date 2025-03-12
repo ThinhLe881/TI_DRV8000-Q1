@@ -171,6 +171,278 @@ uint8_t drv8000_reset(st_DRV8000_Interface_t* interface)
     return ret;
 }
 
+/* *** SPI Read *** */
+uint8_t drv8000_status_registers_read(st_DRV8000_Interface_t* interface)
+{
+    uint8_t ret = 0u;
+
+    ret = drv8000_spi_read(interface,
+                           DRV8000_ADDREG_IC_STAT1,
+                           &drv8000_reg_map[REGID_IC_STAT1]);
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_IC_STAT2,
+                               &drv8000_reg_map[REGID_IC_STAT2]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_GD_STAT, 
+                              &drv8000_reg_map[REGID_GD_STAT]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_STAT1,
+                               &drv8000_reg_map[REGID_HB_STAT1]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_STAT1,
+                               &drv8000_reg_map[REGID_HB_STAT2]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_EC_HEAT_IT_RIP_STAT,
+                               &drv8000_reg_map[REGID_EC_HEAT_IT_RIP_STAT]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_STAT,
+                               &drv8000_reg_map[REGID_HS_STAT]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface)
+{
+    uint8_t ret = 0u;
+
+    ret = drv8000_spi_read(interface,
+                           DRV8000_ADDREG_IC_CNFG1,
+                           &drv8000_reg_map[REGID_IC_CNFG1]);
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_CNFG,
+                                &drv8000_reg_map[REGID_GD_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_IDRV_CNFG,
+                                &drv8000_reg_map[REGID_GD_IDRV_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_VGS_CNFG,
+                                &drv8000_reg_map[REGID_GD_VGS_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_VDS_CNFG,
+                                &drv8000_reg_map[REGID_GD_VDS_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_CSA_CNFG,
+                                &drv8000_reg_map[REGID_GD_CSA_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_AGD_CNFG,
+                                &drv8000_reg_map[REGID_GD_AGD_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_PDR_CNFG,
+                                &drv8000_reg_map[REGID_GD_PDR_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                                DRV8000_ADDREG_GD_STC_CNFG,
+                                &drv8000_reg_map[REGID_GD_STC_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_HEAT_OUT_CNFG,
+                               &drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_OC_CNFG,
+                               &drv8000_reg_map[REGID_HS_OC_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_OL_CNFG,
+                               &drv8000_reg_map[REGID_HS_OL_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_REG_CNFG1,
+                               &drv8000_reg_map[REGID_HS_REG_CNFG1]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_REG_CNFG2,
+                               &drv8000_reg_map[REGID_HS_REG_CNFG2]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_PWM_FREQ_CNFG,
+                               &drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_OCP_DG,
+                               &drv8000_reg_map[REGID_HS_OCP_DG]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_control_registers_read(st_DRV8000_Interface_t* interface)
+{
+    uint8_t ret = 0u;
+
+    ret = drv8000_spi_read(interface,
+                           DRV8000_ADDREG_IC_CTRL,
+                           &drv8000_reg_map[REGID_IC_CTRL]);
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_GD_HB_CTRL,
+                               &drv8000_reg_map[REGID_GD_HB_CTRL]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HS_EC_HEAT_CTRL,
+                               &drv8000_reg_map[REGID_HS_EC_HEAT_CTRL]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT7_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT7_PWM_DC]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT8_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT8_PWM_DC]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT9_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT9_PWM_DC]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT10_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT10_PWM_DC]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT11_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT11_PWM_DC]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_OUT12_PWM_DC,
+                               &drv8000_reg_map[REGID_OUT12_PWM_DC]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_register_read(st_DRV8000_Interface_t* interface)
+{
+    uint8_t ret = 0u;
+
+    /* read device registers */
+    ret = drv8000_status_registers_read(interface);
+    
+    if (0u == ret)
+    {
+        ret = drv8000_config_registers_read(interface);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_control_registers_read(interface);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_spi_read_devid(st_DRV8000_Interface_t* interface)
+{
+    un_DRV8000_Reg_t reg_val;
+
+    (void)drv8000_spi_read(interface,
+                           DRV8000_ADDREG_DEVICE_ID,
+                           &reg_val);
+
+    return (uint8_t)(reg_val.u16_RegWord & DRV8000_DEVICE_ID_MASK);
+}
+
+/* *** SPI Control *** */
+uint8_t drv8000_clear_fault(st_DRV8000_Interface_t* interface)
+{
+    drv8000_reg_map[REGID_IC_CTRL].Reg_IC_CTRL.CLR_FLT = 1u;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_IC_CTRL,
+                             drv8000_reg_map[REGID_IC_CTRL]);
+}
+
+uint8_t drv8000_cfg_reg_lock(st_DRV8000_Interface_t* interface,
+                             en_LOCK_REG_WRITE_t reg_lock)
+{
+    drv8000_reg_map[REGID_IC_CTRL].Reg_IC_CTRL.CNFG_LOCK = reg_lock;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_IC_CTRL,
+                             drv8000_reg_map[REGID_IC_CTRL]);
+}
+
+uint8_t drv8000_ctrl_reg_lock(st_DRV8000_Interface_t* interface,
+                              en_LOCK_REG_WRITE_t reg_lock)
+{
+    drv8000_reg_map[REGID_IC_CTRL].Reg_IC_CTRL.CTRL_LOCK = reg_lock;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_IC_CTRL,
+                             drv8000_reg_map[REGID_IC_CTRL]);
+}
+
+
 /* **********************************************************************/
 /* ***             Definition of local functions                      ***/
 /* **********************************************************************/
