@@ -15,6 +15,14 @@
 
 
 /* **********************************************************************/
+/* ***            Definition of global macros                         ***/
+/* **********************************************************************/
+// #define GDU_PWM_PERIOD_NOT_FIXED
+// #define GDU_GD_INx_SPI
+#define GDU_GD_IN2_GPIO
+
+
+/* **********************************************************************/
 /* ***            Definition of global plain CONSTants                ***/
 /* **********************************************************************/
 #define DRV8000_REG_ADDRESS_MASK								0x3Fu
@@ -34,25 +42,34 @@
 typedef uint8_t (*DRV8000_SPI_Transceive_fptr)(const uint8_t*, uint8_t*, const uint16_t);
 typedef uint16_t (*DRV8000_Pwm_Set_Dutycycle_fptr)(uint8_t, uint8_t, uint16_t);
 typedef void (*DRV8000_Pwm_Set_Period_fptr)(uint8_t, uint8_t, uint16_t);
-typedef void (*DRV8000_Set_Dig_Io_fptr)(uint8_t);
-typedef void (*DRV8000_Delay_fptr)(uint16_t); /* delay in us */
+typedef uint8_t (*DRV8000_GPIO_Set_fptr)(uint8_t, uint8_t, uint8_t);
+typedef void (*DRV8000_Delay_fptr)(uint16_t); /* Delay in us */
 
 typedef struct
 {
     DRV8000_SPI_Transceive_fptr         fptr_SpiTransceive;
     DRV8000_Pwm_Set_Period_fptr         fptr_PwmSetPeriod;
     DRV8000_Pwm_Set_Dutycycle_fptr      fptr_PwmSetDutycycle;
-    DRV8000_Set_Dig_Io_fptr             fptr_Set_GD_IN1;
-    DRV8000_Set_Dig_Io_fptr             fptr_Set_GD_IN2;
-    DRV8000_Set_Dig_Io_fptr             fptr_Set_nSLEEP;
-    DRV8000_Set_Dig_Io_fptr             fptr_Set_DRVOFF;
+    DRV8000_GPIO_Set_fptr               fptr_Gpio;
     DRV8000_Delay_fptr                  fptr_Delay;
-    uint16_t spi_frame_len;
     uint16_t pwm_max_period;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
 	uint8_t pwm2_instance;
 	uint8_t pwm2_channel;
+    uint8_t pwm_gd_in1_instance;
+    uint8_t pwm_gd_in1_channel;
+#ifdef GDU_GD_IN2_GPIO
+    uint8_t gd_in2_port;
+    uint8_t gd_in2_pin;
+#else
+    uint8_t pwm_gd_in2_instance;
+    uint8_t pwm_gd_in2_channel;
+#endif
+    uint8_t nsleep_port;
+    uint8_t nsleep_pin;
+    uint8_t drvoff_port;
+    uint8_t drvoff_pin;
 } st_DRV8000_Interface_t;
 
 typedef union {
@@ -149,6 +166,33 @@ typedef enum {
 /* **********************************************************************/
 /* ***            Declaration of global functions                     ***/
 /* **********************************************************************/
+/* *** PIN Control *** */
+uint8_t drv8000_wakeup(st_DRV8000_Interface_t* interface);
 
+uint8_t drv8000_sleep_mode(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_enable_gate_driver(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_disable_gate_driver(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_set_pwm_pins(st_DRV8000_Interface_t* interface,
+                             uint8_t instance,
+                             uint8_t channel,
+                             uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                            ,uint16_t period
+#endif
+                            );
+
+uint8_t drv8000_reset(st_DRV8000_Interface_t* interface);
+
+/* *** SPI Control *** */
+uint8_t drv8000_clear_fault(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_cfg_reg_lock(st_DRV8000_Interface_t* interface,
+                             en_LOCK_REG_WRITE_t reg_lock);
+
+uint8_t drv8000_ctrl_reg_lock(st_DRV8000_Interface_t* interface,
+                              en_LOCK_REG_WRITE_t reg_lock);
 
 #endif /* GDU_TI_DRV8000_DRV8000_H_ */
