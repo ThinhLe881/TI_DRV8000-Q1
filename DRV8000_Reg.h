@@ -41,7 +41,7 @@
 /* **************************************************************** */
 /* ************* CONFIG REGISTERS ********************************* */
 /* **************************************************************** */
-#define DRV8000_ADDREG_IC_CNFG1                     0x0Au
+#define DRV8000_ADDREG_IC_CNFG1                     0x09u
 #define DRV8000_ADDREG_IC_CNFG2                     0x0Au
 #define DRV8000_ADDREG_GD_CNFG                      0x0Bu
 #define DRV8000_ADDREG_GD_IDRV_CNFG                 0x0Cu
