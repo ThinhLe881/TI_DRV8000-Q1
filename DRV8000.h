@@ -35,6 +35,7 @@
 #define DRV8000_SUCCESS_SPI_STATUS                              0x0u /* 0     0    0     0   0    0         */
                                                                      /* FAULT WARN OV_UV DRV OTSD SPI_ERR   */
 #define DRV8000_MAX_GEN_PWM_DUTYCYCLE                           0x3FFu /* 10-bit */
+#define DRV8000_MAX_HIGH_SIDE_DRIVERS                           0x6u /* OUT7 to OUT12 */
 
 
 /* **********************************************************************/
@@ -164,6 +165,115 @@ typedef enum
     LOCK_REG_WRITE   = 0x6u, /* b110 */
 } en_LOCK_REG_WRITE_t;
 
+typedef enum
+{
+    HS_OUT_7,
+    HS_OUT_8,
+    HS_OUT_9,
+    HS_OUT_10,
+    HS_OUT_11,
+    HS_OUT_12,
+} en_HS_OUTx_t;
+
+typedef enum
+{
+    HS_CNFG_DISABLED,
+    HS_CNFG_SPI_CONTROL,
+    HS_CNFG_PWM_PIN_CONTROL,
+    HS_CNFG_PWM_GEN,
+} en_HS_CNFG_t;
+
+typedef enum
+{
+    HS_SPI_DISABLE,
+    HS_SPI_ENABLE,
+} en_HS_SPI_EN_t;
+
+typedef enum
+{
+    HS_GEN_PWM_FREQ_108_Hz,
+    HS_GEN_PWM_FREQ_217_Hz,
+    HS_GEN_PWM_FREQ_289_Hz,
+} en_HS_GEN_PWM_FREQ_t;
+
+typedef enum
+{
+    HS_CCM_200mA_20ms,
+    HS_CCM_390mA_10ms,
+} en_HS_CCM_TO_t;
+
+typedef enum
+{
+    HS_OUT7_OCP_ENABLE ,
+    HS_OUT7_OCP_DISABLE,
+} en_HS_OUT7_OCP_DIS_t;
+
+typedef enum
+{
+    HS_OUT7_ITRIP_TIMEOUT_100ms,
+    HS_OUT7_ITRIP_TIMEOUT_200ms,
+    HS_OUT7_ITRIP_TIMEOUT_400ms,
+    HS_OUT7_ITRIP_TIMEOUT_800ms,
+} en_HS_OUT7_ITRIP_TIMEOUT_t;
+
+typedef enum
+{
+    HS_OUT7_ITRIP_FAULT_REPORT_ONLY,
+    HS_OUT7_ITRIP_REGULATION_TIMEOUT_DRIVER_DISABLE,
+    HS_OUT7_ITRIP_REGULATION_ALWAYS,
+    HS_OUT7_ITRIP_REGULATION_TIMEOUT_REGULATION_DISABLE,
+} en_HS_OUT7_ITRIP_CNFG_t;
+
+typedef enum
+{
+    HS_OUT7_ITRIP_BLK_0us  = 0x1u,
+    HS_OUT7_ITRIP_BLK_20us = 0x2u,
+    HS_OUT7_ITRIP_BLK_40us = 0x3u,
+} en_HS_OUT7_ITRIP_BLK_t;
+
+typedef enum
+{
+    HS_OUT7_ITRIP_FREQ_1_7kHz,
+    HS_OUT7_ITRIP_FREQ_2_2kHz,
+    HS_OUT7_ITRIP_FREQ_3kHz,
+    HS_OUT7_ITRIP_FREQ_4_4kHz,
+} en_HS_OUT7_ITRIP_FREQ_t;
+
+typedef enum
+{
+    HS_OUT7_ITRIP_DG_48us,
+    HS_OUT7_ITRIP_DG_40us,
+    HS_OUT7_ITRIP_DG_32us,
+    HS_OUT7_ITRIP_DG_24us,
+} en_HS_OUT7_ITRIP_DG_t;
+
+typedef enum
+{
+    HS_OC_LOW_CURRENT_TH,   /* 250mA, 500mA for OUT7 */
+    HS_OC_HIGH_CURRENT_TH,  /* 500mA, 1.5A for OUT7 */
+} en_HS_OC_TH_t;
+
+typedef enum
+{
+    HS_OCP_DG_6us,
+    HS_OCP_DG_10us,
+    HS_OCP_DG_20us,
+    HS_OCP_DG_60us,
+} en_HS_OCP_DG_t;
+
+typedef struct
+{
+    uint8_t        hs_outx;
+    en_HS_OC_TH_t  hs_oc_th;
+    en_HS_OCP_DG_t hs_ocp_dg;
+} st_HS_OCP_Config_t;
+
+typedef enum
+{
+    HS_OLA_LOW_TH,
+    HS_OLA_HIGH_TH,
+} en_HS_OLA_t;
+
 
 /* **********************************************************************/
 /* ***               Definition of global variables                   ***/
@@ -226,5 +336,48 @@ uint8_t drv8000_cfg_reg_lock(st_DRV8000_Interface_t* interface,
 
 uint8_t drv8000_ctrl_reg_lock(st_DRV8000_Interface_t* interface,
                               en_LOCK_REG_WRITE_t reg_lock);
+
+/* ** High Side Driver Control ** */
+uint8_t drv8000_hs_driver_cnfg(st_DRV8000_Interface_t* interface,
+                               en_HS_OUTx_t hs_outx,
+                               en_HS_CNFG_t hs_out_cnfg);
+
+uint8_t drv8000_hs_driver_spi(st_DRV8000_Interface_t* interface,
+                              en_HS_OUTx_t hs_outx,
+                              en_HS_SPI_EN_t hs_spi_en);
+
+uint8_t drv8000_hs_driver_pwm_gen(st_DRV8000_Interface_t* interface,
+                                  en_HS_OUTx_t hs_outx,
+                                  en_HS_GEN_PWM_FREQ_t freq,
+                                  uint16_t dutycycle);
+
+uint8_t drv8000_hs_set_gen_pwm_freq(st_DRV8000_Interface_t* interface,
+                                    en_HS_OUTx_t hs_outx,
+                                    en_HS_GEN_PWM_FREQ_t freq);
+
+uint8_t drv8000_hs_set_gen_pwm_dutycycle(st_DRV8000_Interface_t* interface,
+                                         en_HS_OUTx_t hs_outx,
+                                         uint16_t dutycycle);
+
+uint8_t drv8000_hs_set_ccm(st_DRV8000_Interface_t* interface,
+                           en_HS_OUTx_t hs_outx,
+                           en_HS_CCM_TO_t hs_ccm);
+
+uint8_t drv8000_hs_set_out7_itrip(st_DRV8000_Interface_t* interface,
+                                  en_HS_OUT7_ITRIP_CNFG_t cnfg,
+                                  en_HS_OUT7_ITRIP_TIMEOUT_t timeout,
+                                  en_HS_OUT7_ITRIP_BLK_t blanking_time,
+                                  en_HS_OUT7_ITRIP_FREQ_t regulation_freq,
+                                  en_HS_OUT7_ITRIP_DG_t deglitch_time);
+
+uint8_t drv8000_hs_set_out7_ocp_enable(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_hs_set_out7_ocp_disable(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_hs_ocp_config(st_DRV8000_Interface_t* interface,
+                              en_HS_OUTx_t hs_outx,
+                              en_HS_OC_TH_t hs_oc_th,
+                              en_HS_OCP_DG_t hs_ocp_dg);
+
 
 #endif /* GDU_TI_DRV8000_DRV8000_H_ */

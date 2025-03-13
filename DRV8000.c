@@ -555,6 +555,485 @@ uint8_t drv8000_ctrl_reg_lock(st_DRV8000_Interface_t* interface,
                              drv8000_reg_map[REGID_IC_CTRL]);
 }
 
+/* ** High Side Driver Control ** */
+uint8_t drv8000_hs_driver_cnfg(st_DRV8000_Interface_t* interface,
+                               en_HS_OUTx_t hs_outx,
+                               en_HS_CNFG_t hs_out_cnfg)
+{
+    uint8_t ret = 0u;
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT12_CNFG = hs_out_cnfg;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT11_CNFG = hs_out_cnfg;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT10_CNFG = hs_out_cnfg;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT9_CNFG = hs_out_cnfg;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT8_CNFG = hs_out_cnfg;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT7_CNFG = hs_out_cnfg;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_HEAT_OUT_CNFG,
+                                drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_driver_spi(st_DRV8000_Interface_t* interface,
+                              en_HS_OUTx_t hs_outx,
+                              en_HS_SPI_EN_t hs_spi_en)
+{
+    uint8_t ret = 0u;
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT12_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT12_EN = hs_spi_en;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT11_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT11_EN = hs_spi_en;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT10_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT10_EN = hs_spi_en;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT9_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT9_EN = hs_spi_en;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT8_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT8_EN = hs_spi_en;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT7_CNFG = HS_CNFG_SPI_CONTROL;
+            drv8000_reg_map[REGID_HS_EC_HEAT_CTRL].Reg_HS_EC_HEAT_CTRL.OUT7_EN = hs_spi_en;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+    
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_HEAT_OUT_CNFG,
+                                drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_EC_HEAT_CTRL,
+                                drv8000_reg_map[REGID_HS_EC_HEAT_CTRL]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_driver_pwm_gen(st_DRV8000_Interface_t* interface,
+                                  en_HS_OUTx_t hs_outx,
+                                  en_HS_GEN_PWM_FREQ_t freq,
+                                  uint16_t dutycycle)
+{
+    uint8_t ret = 0u;
+    uint8_t dc_reg_id;
+    uint8_t dc_reg_addr;
+
+    dutycycle = dutycycle & DRV8000_MAX_GEN_PWM_DUTYCYCLE; /* 10-bit only */
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            dc_reg_id = REGID_OUT12_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT12_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT12_PWM_DC.OUT12_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT12_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT12_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        case HS_OUT_11:
+            dc_reg_id = REGID_OUT11_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT11_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT11_PWM_DC.OUT11_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT11_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT11_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        case HS_OUT_10:
+            dc_reg_id = REGID_OUT10_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT10_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT10_PWM_DC.OUT10_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT10_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT10_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        case HS_OUT_9:
+            dc_reg_id = REGID_OUT9_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT9_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT9_PWM_DC.OUT9_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT9_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT9_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        case HS_OUT_8:
+            dc_reg_id = REGID_OUT8_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT8_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT8_PWM_DC.OUT8_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT8_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT8_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        case HS_OUT_7:
+            dc_reg_id = REGID_OUT7_PWM_DC;
+            dc_reg_addr = DRV8000_ADDREG_OUT7_PWM_DC;
+            drv8000_reg_map[dc_reg_id].Reg_OUT7_PWM_DC.OUT7_DC = dutycycle;
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT7_FREQ = freq;
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT7_CNFG = HS_CNFG_PWM_GEN;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                dc_reg_addr,
+                                drv8000_reg_map[dc_reg_id]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_PWM_FREQ_CNFG,
+                                drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_HEAT_OUT_CNFG,
+                                drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
+    }
+    
+    return ret;
+}
+
+uint8_t drv8000_hs_set_gen_pwm_freq(st_DRV8000_Interface_t* interface,
+                                    en_HS_OUTx_t hs_outx,
+                                    en_HS_GEN_PWM_FREQ_t freq)
+{
+    uint8_t ret = 0u;
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT12_FREQ = freq;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT11_FREQ = freq;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT10_FREQ = freq;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT9_FREQ = freq;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT8_FREQ = freq;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG].Reg_HS_PWM_FREQ.PWM_OUT7_FREQ = freq;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_PWM_FREQ_CNFG,
+                                drv8000_reg_map[REGID_HS_PWM_FREQ_CNFG]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_set_gen_pwm_dutycycle(st_DRV8000_Interface_t* interface,
+                                         en_HS_OUTx_t hs_outx,
+                                         uint16_t dutycycle)
+{
+    uint8_t ret = 0u;
+    uint8_t reg_id;
+    uint8_t reg_addr;
+
+    dutycycle = dutycycle & DRV8000_MAX_GEN_PWM_DUTYCYCLE; /* 10-bit only */
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            reg_id = REGID_OUT12_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT12_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT12_PWM_DC.OUT12_DC = dutycycle;
+            break;
+        case HS_OUT_11:
+            reg_id = REGID_OUT11_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT11_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT11_PWM_DC.OUT11_DC = dutycycle;
+            break;
+        case HS_OUT_10:
+            reg_id = REGID_OUT10_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT10_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT10_PWM_DC.OUT10_DC = dutycycle;
+            break;
+        case HS_OUT_9:
+            reg_id = REGID_OUT9_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT9_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT9_PWM_DC.OUT9_DC = dutycycle;
+            break;
+        case HS_OUT_8:
+            reg_id = REGID_OUT8_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT8_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT8_PWM_DC.OUT8_DC = dutycycle;
+            break;
+        case HS_OUT_7:
+            reg_id = REGID_OUT7_PWM_DC;
+            reg_addr = DRV8000_ADDREG_OUT7_PWM_DC;
+            drv8000_reg_map[reg_id].Reg_OUT7_PWM_DC.OUT7_DC = dutycycle;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                reg_addr,
+                                drv8000_reg_map[reg_id]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_set_ccm(st_DRV8000_Interface_t* interface,
+                           en_HS_OUTx_t hs_outx,
+                           en_HS_CCM_TO_t hs_ccm)
+{
+    /* Note: Short circuit and over current detection are disabled during constant current mode */
+    uint8_t ret = 0u;
+    /* CCM has to be configured before enabling HS driver */
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT12_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT12_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT12_CCM_EN = 1u;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT11_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT11_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT11_CCM_EN = 1u;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT10_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT10_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT10_CCM_EN = 1u;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT9_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT9_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT9_CCM_EN = 1u;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT8_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT8_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT8_CCM_EN = 1u;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG].Reg_HS_HEAT_OUT_CNFG.OUT7_CNFG = HS_CNFG_DISABLED;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT7_CCM_TO = hs_ccm;
+            drv8000_reg_map[REGID_HS_REG_CNFG2].Reg_HS_REG_CNFG2.OUT7_CCM_EN = 1u;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+    /* Disable HS driver before configuring CCM */
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_HEAT_OUT_CNFG,
+                                drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
+    }
+    /* Configure CCM */
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_REG_CNFG2,
+                                drv8000_reg_map[REGID_HS_REG_CNFG2]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_set_out7_itrip(st_DRV8000_Interface_t* interface,
+                                  en_HS_OUT7_ITRIP_CNFG_t cnfg,
+                                  en_HS_OUT7_ITRIP_TIMEOUT_t timeout,
+                                  en_HS_OUT7_ITRIP_BLK_t blanking_time,
+                                  en_HS_OUT7_ITRIP_FREQ_t regulation_freq,
+                                  en_HS_OUT7_ITRIP_DG_t deglitch_time)
+{
+    /* Must disable OUT7 over current protection for ITRIP to work */
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_OCP_DIS = HS_OUT7_OCP_DISABLE;
+    /* Configure ITRIP */
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.ITRIP_TO_SEL = timeout;
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_ITRIP_CNFG = cnfg;
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_ITRIP_BLK = blanking_time;
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_ITRIP_FREQ = regulation_freq;
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_ITRIP_DG = deglitch_time;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_HS_REG_CNFG1,
+                             drv8000_reg_map[REGID_HS_REG_CNFG1]);
+}
+
+uint8_t drv8000_hs_set_out7_ocp_enable(st_DRV8000_Interface_t* interface)
+{
+    /* Remove all ITRIP configs and enable OCP */
+    drv8000_reg_map[REGID_HS_REG_CNFG1].u16_RegWord = 0u;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_HS_REG_CNFG1,
+                             drv8000_reg_map[REGID_HS_REG_CNFG1]);
+}
+
+uint8_t drv8000_hs_set_out7_ocp_disable(st_DRV8000_Interface_t* interface)
+{
+    /* Remove all ITRIP configs and disable OCP */
+    drv8000_reg_map[REGID_HS_REG_CNFG1].u16_RegWord = 0u;
+    drv8000_reg_map[REGID_HS_REG_CNFG1].Reg_HS_REG_CNFG1.OUT7_OCP_DIS = HS_OUT7_OCP_DISABLE;
+
+    return drv8000_spi_write(interface,
+                             DRV8000_ADDREG_HS_REG_CNFG1,
+                             drv8000_reg_map[REGID_HS_REG_CNFG1]);
+}
+
+uint8_t drv8000_hs_ocp_config(st_DRV8000_Interface_t* interface,
+                              en_HS_OUTx_t hs_outx,
+                              en_HS_OC_TH_t hs_oc_th,
+                              en_HS_OCP_DG_t hs_ocp_dg)
+{
+    uint8_t ret = 0u;
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT12_OC_TH = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT12_OCP_DG = hs_ocp_dg;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT11_OC_TH = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT11_OCP_DG = hs_ocp_dg;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT10_OC_TH = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT10_OCP_DG = hs_ocp_dg;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT9_OC_TH = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT9_OCP_DG = hs_ocp_dg;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT8_OC_TH = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT8_OCP_DG = hs_ocp_dg;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_OC_CNFG].Reg_HS_OC_CNFG.OUT7_RDSON_MODE = hs_oc_th;
+            drv8000_reg_map[REGID_HS_OCP_DG].Reg_HS_OCP_DG.OUT7_OCP_DG = hs_ocp_dg;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_OC_CNFG,
+                                drv8000_reg_map[REGID_HS_OC_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_OCP_DG,
+                                drv8000_reg_map[REGID_HS_OCP_DG]);
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_hs_ola_config(st_DRV8000_Interface_t* interface,
+                              en_HS_OUTx_t hs_outx,
+                              en_HS_OLA_t hs_ola_th)
+{
+    uint8_t ret = 0u;
+
+    switch (hs_outx)
+    {
+        case HS_OUT_12:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        case HS_OUT_11:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        case HS_OUT_10:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        case HS_OUT_9:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        case HS_OUT_8:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        case HS_OUT_7:
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_TH = hs_ola_th;
+            drv8000_reg_map[REGID_HS_OL_CNFG].Reg_HS_OL_CNFG.OUT12_OLA_EN = 1u;
+            break;
+        default:
+            ret = 1u;
+            break;
+    }
+
+    if (0u == ret)
+    {
+        ret = drv8000_spi_write(interface,
+                                DRV8000_ADDREG_HS_OL_CNFG,
+                                drv8000_reg_map[REGID_HS_OL_CNFG]);
+    }
+
+    return ret;
+}
+
 
 /* **********************************************************************/
 /* ***             Definition of local functions                      ***/
