@@ -31,6 +31,7 @@
 #define DRV8000_DEVICE_ID_MASK                                  0xFFu
 #define DRV8000_WRITE_ACCESS                                    0u
 #define DRV8000_READ_ACCESS                                     1u
+#define DRV8000_SPI_FRAME_LEN                                   4u /* 24 bits + 8 bits padding = 4 8-bit buffers */
 #define DRV8000_SUCCESS_SPI_STATUS                              0x0u /* 0     0    0     0   0    0         */
                                                                      /* FAULT WARN OV_UV DRV OTSD SPI_ERR   */
 #define DRV8000_MAX_GEN_PWM_DUTYCYCLE                           0x3FFu /* 10-bit */
@@ -156,6 +157,12 @@ typedef enum {
 
     DRV8000_NUM_OF_REGS		           ,
 } en_REG_ID_t;
+
+typedef enum
+{
+    UNLOCK_REG_WRITE = 0x3u, /* b011 */
+    LOCK_REG_WRITE   = 0x6u, /* b110 */
+} en_LOCK_REG_WRITE_t;
 
 
 /* **********************************************************************/

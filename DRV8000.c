@@ -73,6 +73,163 @@ uint8_t drv8000_delay_set(st_DRV8000_Interface_t* interface,
 /* **********************************************************************/
 /* ***            Definition of global functions                      ***/
 /* **********************************************************************/
+/* *** PIN Control *** */
+uint8_t drv8000_pin_gd_enable(st_DRV8000_Interface_t* interface)
+{
+    /* Enable gate driver - gate driver half-bridges are pulled up to PVDD */
+    /* De-assert DRVOFF does not enable gate driver, 
+        use drv8000_enable_gate_driver() to flip gate driver enable bit */
+    uint8_t ret = 0u;
+    ret = drv8000_gpio_set(interface,
+                           interface->drvoff_port,
+                           interface->drvoff_pin,
+                           0u);
+
+    if (0u == ret)
+    {
+        drv8000_delay_set(interface, 3000u); /* Wait ~3ms to register a valid DRVOFF command */
+        ret = drv8000_clear_fault(interface); /* Clear DRVOFF_STAT flag */
+
+        if (0u == ret)
+        {
+            ret = drv8000_spi_read(interface, DRV8000_ADDREG_GD_STAT, &drv8000_reg_map[REGID_GD_STAT]);
+
+            if (0u != ret || 0u != drv8000_reg_map[REGID_GD_STAT].Reg_GD_STAT.DRVOFF_STAT)
+            {
+                ret = 1u;
+            }
+        }
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_pin_gd_disable(st_DRV8000_Interface_t* interface)
+{
+    /* Disable gate driver - pull down gate driver half-bridges to Hi-Z */
+    uint8_t ret = 0u;
+    ret = drv8000_gpio_set(interface,
+                           interface->drvoff_port,
+                           interface->drvoff_pin,
+                           1u);
+
+    if (0u == ret)
+    {
+        drv8000_delay_set(interface, 3000u); /* Wait ~3ms to register a valid DRVOFF command */
+        ret = drv8000_spi_read(interface, DRV8000_ADDREG_GD_STAT, &drv8000_reg_map[REGID_GD_STAT]);
+
+        if (0u != ret || 1u != drv8000_reg_map[REGID_GD_STAT].Reg_GD_STAT.DRVOFF_STAT)
+        {
+            ret = 1u;
+        }
+    }
+
+    return ret;
+}
+
+uint8_t drv8000_pin_set_pwm1(st_DRV8000_Interface_t* interface,
+                             uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                            ,uint16_t period
+#endif
+                            )
+{
+    return drv8000_pwm_set(interface,
+                                interface->pwm1_instance,
+                                interface->pwm1_channel,
+                                dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                                ,period
+#endif
+                            );
+}
+
+uint8_t drv8000_pin_set_gd_in1(st_DRV8000_Interface_t* interface,
+                               uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                              ,uint16_t period
+#endif
+                              )
+{
+    return drv8000_pwm_set(interface,
+                                interface->pwm_gd_in1_instance,
+                                interface->pwm_gd_in1_channel,
+                                dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                                ,period
+#endif
+                            );
+}
+
+#ifndef GDU_GD_IN2_GPIO
+uint8_t drv8000_pin_set_gd_in2(st_DRV8000_Interface_t* interface,
+                               uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                              ,uint16_t period
+#endif
+                              )
+{
+    return drv8000_pwm_set(interface,
+                                interface->pwm_gd_in2_instance,
+                                interface->pwm_gd_in2_channel,
+                                dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                                ,period
+#endif
+                            );
+}
+#endif
+
+uint8_t drv8000_wakeup(st_DRV8000_Interface_t* interface)
+{
+    return drv8000_gpio_set(interface,
+                            interface->nsleep_port,
+                            interface->nsleep_pin,
+                            1u);
+}
+
+uint8_t drv8000_sleep_mode(st_DRV8000_Interface_t* interface)
+{
+    return drv8000_gpio_set(interface,
+                            interface->nsleep_port,
+                            interface->nsleep_pin,
+                            0u);
+}
+
+uint8_t drv8000_reset(st_DRV8000_Interface_t* interface)
+{
+    uint8_t ret = 0u;
+
+    if (NULL == interface || NULL == interface->fptr_Gpio || NULL == interface->fptr_Delay)
+    {
+        ret = 1u;
+    } else {
+        /* Sleep DRV8000 */
+        ret = interface->fptr_Gpio(interface->nsleep_port,
+                                   interface->nsleep_pin,
+                                   0u);
+
+        if (0u == ret)
+        {
+            /* (Optional) wait ~2us for DRV8000 to completely disabled, otherwise register values won't reset */
+            interface->fptr_Delay(2u);
+            /* Wakeup DRV8000 */
+            ret = interface->fptr_Gpio(interface->nsleep_port,
+                                       interface->nsleep_pin,
+                                       1u);
+            if (0u == ret)
+            {
+                /* (Optional) wait ~6us for DRV8000 to completely wakeup, otherwise SPI comm won't work */
+                interface->fptr_Delay(6u);
+                /* Set register default value */
+                drv8000_reg_map[REGID_IC_CTRL].u16_RegWord = DRV8000_DEFVAL_IC_CTRL;
+            }
+        }
+    }
+
+    return ret;
+}
+
 /* *** SPI Read *** */
 uint8_t drv8000_read_status_registers(st_DRV8000_Interface_t* interface)
 {
