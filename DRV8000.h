@@ -125,15 +125,15 @@ typedef enum {
     REGID_GD_AGD_CNFG                  ,
     REGID_GD_PDR_CNFG                  ,
     REGID_GD_STC_CNFG                  ,
-    /* REGID_HB_ITRIP_DG                  , */
-    /* REGID_HB_OUT_CNFG1                 , */
-    /* REGID_HB_OUT_CNFG2                 , */
-    /* REGID_HB_OCP_CNFG                  , */
-    /* REGID_HB_OL_CNFG1                  , */
-    /* REGID_HB_OL_CNFG2                  , */
-    /* REGID_HB_SR_CNFG                   , */
-    /* REGID_HB_ITRIP_CNFG                , */
-    /* REGID_HB_ITRIP_FREQ                , */
+    REGID_HB_ITRIP_DG                  ,
+    REGID_HB_OUT_CNFG1                 ,
+    REGID_HB_OUT_CNFG2                 ,
+    REGID_HB_OCP_CNFG                  ,
+    REGID_HB_OL_CNFG1                  ,
+    REGID_HB_OL_CNFG2                  ,
+    REGID_HB_SR_CNFG                   ,
+    REGID_HB_ITRIP_CNFG                ,
+    REGID_HB_ITRIP_FREQ                ,
     REGID_HS_HEAT_OUT_CNFG             ,
     REGID_HS_OC_CNFG                   ,
     REGID_HS_OL_CNFG                   ,
@@ -167,35 +167,49 @@ typedef enum {
 /* ***            Declaration of global functions                     ***/
 /* **********************************************************************/
 /* *** PIN Control *** */
-uint8_t drv8000_wakeup(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_pin_gd_enable(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_sleep_mode(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_pin_gd_disable(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_enable_gate_driver(st_DRV8000_Interface_t* interface);
-
-uint8_t drv8000_disable_gate_driver(st_DRV8000_Interface_t* interface);
-
-uint8_t drv8000_set_pwm_pins(st_DRV8000_Interface_t* interface,
-                             uint8_t instance,
-                             uint8_t channel,
+uint8_t drv8000_pin_set_pwm1(st_DRV8000_Interface_t* interface,
                              uint16_t dutycycle
 #ifdef GDU_PWM_PERIOD_NOT_FIXED
                             ,uint16_t period
 #endif
                             );
 
+uint8_t drv8000_pin_set_gd_in1(st_DRV8000_Interface_t* interface,
+                               uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                              ,uint16_t period
+#endif
+                              );
+
+#ifndef GDU_GD_IN2_GPIO
+uint8_t drv8000_pin_set_gd_in2(st_DRV8000_Interface_t* interface,
+                               uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                              ,uint16_t period
+#endif
+                              );
+#endif
+
+uint8_t drv8000_wakeup(st_DRV8000_Interface_t* interface);
+
+uint8_t drv8000_sleep_mode(st_DRV8000_Interface_t* interface);
+
 uint8_t drv8000_reset(st_DRV8000_Interface_t* interface);
 
 /* *** SPI Read *** */
-uint8_t drv8000_status_registers_read(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_read_status_registers(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_read_config_registers(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_control_registers_read(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_read_control_registers(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_register_read(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_read_registers(st_DRV8000_Interface_t* interface);
 
-uint8_t drv8000_spi_read_devid(st_DRV8000_Interface_t* interface);
+uint8_t drv8000_read_devid(st_DRV8000_Interface_t* interface);
 
 /* *** SPI Control *** */
 uint8_t drv8000_clear_fault(st_DRV8000_Interface_t* interface);

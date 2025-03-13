@@ -35,9 +35,9 @@ static un_DRV8000_SPI_STST_t drv8000_global_spi_status;
 /* **********************************************************************/
 /* ***             Declaration of local functions                     ***/
 /* **********************************************************************/
-uint8_t drv8000_check_spi_status(void);
+uint8_t drv8000_spi_status_check(void);
 
-un_DRV8000_SPI_STST_t drv8000_get_spi_status(void);
+un_DRV8000_SPI_STST_t drv8000_spi_status_get(void);
 
 uint8_t drv8000_spi_read(st_DRV8000_Interface_t* interface,
                          const uint8_t reg_addr,
@@ -46,6 +46,23 @@ uint8_t drv8000_spi_read(st_DRV8000_Interface_t* interface,
 uint8_t drv8000_spi_write(st_DRV8000_Interface_t* interface,
                           const uint8_t reg_addr,
                           const un_DRV8000_Reg_t reg_val);
+
+uint8_t drv8000_gpio_set(st_DRV8000_Interface_t* interface,
+                         uint8_t port,
+                         uint8_t pin,
+                         uint8_t pin_level);
+
+uint8_t drv8000_pwm_set(st_DRV8000_Interface_t* interface,
+                             uint8_t instance,
+                             uint8_t channel,
+                             uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                            ,uint16_t period
+#endif
+                            );
+
+uint8_t drv8000_delay_set(st_DRV8000_Interface_t* interface,
+                          uint16_t delay_us);
 
 
 /* **********************************************************************/
@@ -56,123 +73,8 @@ uint8_t drv8000_spi_write(st_DRV8000_Interface_t* interface,
 /* **********************************************************************/
 /* ***            Definition of global functions                      ***/
 /* **********************************************************************/
-/* *** PIN Control *** */
-uint8_t drv8000_wakeup(st_DRV8000_Interface_t* interface)
-{
-    return drv8000_gpio_set(interface,
-                            interface->nsleep_port,
-                            interface->nsleep_pin,
-                            1u);
-}
-
-uint8_t drv8000_sleep_mode(st_DRV8000_Interface_t* interface)
-{
-    return drv8000_gpio_set(interface,
-                            interface->nsleep_port,
-                            interface->nsleep_pin,
-                            0u);
-}
-
-uint8_t drv8000_enable_gate_driver(st_DRV8000_Interface_t* interface)
-{
-    return drv8000_gpio_set(interface,
-                            interface->drvoff_port,
-                            interface->drvoff_pin,
-                            0u);
-}
-
-uint8_t drv8000_disable_gate_driver(st_DRV8000_Interface_t* interface)
-{
-    return drv8000_gpio_set(interface,
-                            interface->drvoff_port,
-                            interface->drvoff_pin,
-                            1u);
-}
-
-uint8_t drv8000_set_pwm_pins(st_DRV8000_Interface_t* interface,
-                             uint8_t instance,
-                             uint8_t channel,
-                             uint16_t dutycycle
-#ifdef GDU_PWM_PERIOD_NOT_FIXED
-                            ,uint16_t period
-#endif
-                            )
-{
-    if (NULL == interface || NULL == interface->fptr_PwmSetDutycycle)
-    {
-        return 1u;
-    }
-#ifdef GDU_PWM_PERIOD_NOT_FIXED
-    if (NULL == interface->fptr_PwmSetPeriod)
-    {
-        return 1u;
-    }
-    if (period > interface->pwm_max_period)
-    {
-        period = interface->pwm_max_period;
-    }
-    if (dutycycle > period)
-    {
-        dutycycle = period;
-    }
-
-    interface->fptr_PwmSetPeriod(instance,
-                                 channel,
-                                 period);
-#else
-    if (dutycycle > interface->pwm_max_period)
-    {
-        dutycycle = interface->pwm_max_period;
-    }
-#endif
-    return interface->fptr_PwmSetDutycycle(instance,
-                                           channel,
-                                           dutycycle);
-}
-
-uint8_t drv8000_reset(st_DRV8000_Interface_t* interface)
-{
-    uint8_t ret = 0u;
-
-    if (NULL == interface || NULL == interface->fptr_Gpio || NULL == interface->fptr_Delay)
-    {
-        ret = 1u;
-    } else {
-        // /* Disable gate driver - pull DRVOFF to high */
-        // ret = interface->fptr_Gpio(interface->drvoff_port,
-        //                            interface->drvoff_pin,
-        //                            1u);
-
-        if (0u == ret)
-        {
-            /* Sleep DRV8000 */
-            ret = interface->fptr_Gpio(interface->nsleep_port,
-                                       interface->nsleep_pin,
-                                       0u);
-        }
-        if (0u == ret)
-        {
-            /* (Optional) wait ~2us for DRV8000 to completely disabled, otherwise register values won't reset */
-            interface->fptr_Delay(2u);
-            /* Wakeup DRV8000 */
-            ret = interface->fptr_Gpio(interface->nsleep_port,
-                                       interface->nsleep_pin,
-                                       1u);
-            if (0u == ret)
-            {
-                /* (Optional) wait ~6us for DRV8000 to completely wakeup, otherwise SPI comm won't work */
-                interface->fptr_Delay(6u);
-                /* Set register default value */
-                drv8000_reg_map[REGID_IC_CTRL].u16_RegWord = DRV8000_DEFVAL_IC_CTRL;
-            }
-        }
-    }
-
-    return ret;
-}
-
 /* *** SPI Read *** */
-uint8_t drv8000_status_registers_read(st_DRV8000_Interface_t* interface)
+uint8_t drv8000_read_status_registers(st_DRV8000_Interface_t* interface)
 {
     uint8_t ret = 0u;
 
@@ -220,7 +122,7 @@ uint8_t drv8000_status_registers_read(st_DRV8000_Interface_t* interface)
     return ret;
 }
 
-uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface)
+uint8_t drv8000_read_config_registers(st_DRV8000_Interface_t* interface)
 {
     uint8_t ret = 0u;
 
@@ -231,50 +133,104 @@ uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface)
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_CNFG,
-                                &drv8000_reg_map[REGID_GD_CNFG]);
+                               DRV8000_ADDREG_GD_CNFG,
+                               &drv8000_reg_map[REGID_GD_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_IDRV_CNFG,
-                                &drv8000_reg_map[REGID_GD_IDRV_CNFG]);
+                               DRV8000_ADDREG_GD_IDRV_CNFG,
+                               &drv8000_reg_map[REGID_GD_IDRV_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_VGS_CNFG,
-                                &drv8000_reg_map[REGID_GD_VGS_CNFG]);
+                               DRV8000_ADDREG_GD_VGS_CNFG,
+                               &drv8000_reg_map[REGID_GD_VGS_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_VDS_CNFG,
-                                &drv8000_reg_map[REGID_GD_VDS_CNFG]);
+                               DRV8000_ADDREG_GD_VDS_CNFG,
+                               &drv8000_reg_map[REGID_GD_VDS_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_CSA_CNFG,
-                                &drv8000_reg_map[REGID_GD_CSA_CNFG]);
+                               DRV8000_ADDREG_GD_CSA_CNFG,
+                               &drv8000_reg_map[REGID_GD_CSA_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_AGD_CNFG,
-                                &drv8000_reg_map[REGID_GD_AGD_CNFG]);
+                               DRV8000_ADDREG_GD_AGD_CNFG,
+                               &drv8000_reg_map[REGID_GD_AGD_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_PDR_CNFG,
-                                &drv8000_reg_map[REGID_GD_PDR_CNFG]);
+                               DRV8000_ADDREG_GD_PDR_CNFG,
+                               &drv8000_reg_map[REGID_GD_PDR_CNFG]);
     }
     if (0u == ret)
     {
         ret = drv8000_spi_read(interface,
-                                DRV8000_ADDREG_GD_STC_CNFG,
-                                &drv8000_reg_map[REGID_GD_STC_CNFG]);
+                               DRV8000_ADDREG_GD_STC_CNFG,
+                               &drv8000_reg_map[REGID_GD_STC_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_ITRIP_DG,
+                               &drv8000_reg_map[REGID_HB_ITRIP_DG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_OUT_CNFG1,
+                               &drv8000_reg_map[REGID_HB_OUT_CNFG1]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_OUT_CNFG2,
+                               &drv8000_reg_map[REGID_HB_OUT_CNFG2]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_OCP_CNFG,
+                               &drv8000_reg_map[REGID_HB_OCP_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_OL_CNFG1,
+                               &drv8000_reg_map[REGID_HB_OL_CNFG1]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_OL_CNFG2,
+                               &drv8000_reg_map[REGID_HB_OL_CNFG2]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_SR_CNFG,
+                               &drv8000_reg_map[REGID_HB_SR_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_ITRIP_CNFG,
+                               &drv8000_reg_map[REGID_HB_ITRIP_CNFG]);
+    }
+    if (0u == ret)
+    {
+        ret = drv8000_spi_read(interface,
+                               DRV8000_ADDREG_HB_ITRIP_FREQ,
+                               &drv8000_reg_map[REGID_HB_ITRIP_FREQ]);
     }
     if (0u == ret)
     {
@@ -322,7 +278,7 @@ uint8_t drv8000_config_registers_read(st_DRV8000_Interface_t* interface)
     return ret;
 }
 
-uint8_t drv8000_control_registers_read(st_DRV8000_Interface_t* interface)
+uint8_t drv8000_read_control_registers(st_DRV8000_Interface_t* interface)
 {
     uint8_t ret = 0u;
 
@@ -382,26 +338,26 @@ uint8_t drv8000_control_registers_read(st_DRV8000_Interface_t* interface)
     return ret;
 }
 
-uint8_t drv8000_register_read(st_DRV8000_Interface_t* interface)
+uint8_t drv8000_read_registers(st_DRV8000_Interface_t* interface)
 {
     uint8_t ret = 0u;
 
     /* read device registers */
-    ret = drv8000_status_registers_read(interface);
+    ret = drv8000_read_status_registers(interface);
     
     if (0u == ret)
     {
-        ret = drv8000_config_registers_read(interface);
+        ret = drv8000_read_config_registers(interface);
     }
     if (0u == ret)
     {
-        ret = drv8000_control_registers_read(interface);
+        ret = drv8000_read_control_registers(interface);
     }
 
     return ret;
 }
 
-uint8_t drv8000_spi_read_devid(st_DRV8000_Interface_t* interface)
+uint8_t drv8000_read_devid(st_DRV8000_Interface_t* interface)
 {
     un_DRV8000_Reg_t reg_val;
 
@@ -446,7 +402,7 @@ uint8_t drv8000_ctrl_reg_lock(st_DRV8000_Interface_t* interface,
 /* **********************************************************************/
 /* ***             Definition of local functions                      ***/
 /* **********************************************************************/
-uint8_t drv8000_check_spi_status(void)
+uint8_t drv8000_spi_status_check(void)
 {
     if (DRV8000_SUCCESS_SPI_STATUS != drv8000_global_spi_status.u8_SpiCommStatus)
     {
@@ -456,7 +412,7 @@ uint8_t drv8000_check_spi_status(void)
     return 0u;
 }
 
-un_DRV8000_SPI_STST_t drv8000_get_spi_status(void)
+un_DRV8000_SPI_STST_t drv8000_spi_status_get(void)
 {
     return drv8000_global_spi_status;
 }
@@ -488,7 +444,7 @@ uint8_t drv8000_spi_read(st_DRV8000_Interface_t* interface,
     {
         reg_val->u16_RegWord = spi_receive.st_SpiCommand.DataField;
         drv8000_global_spi_status.u8_SpiCommStatus = spi_receive.st_SpiCommand.SpiStastus & DRV8000_GLOBAL_STATUS_MASK;
-        ret = drv8000_check_spi_status();
+        ret = drv8000_spi_status_check();
     } else 
     {
         reg_val->u16_RegWord = 0u;
@@ -539,7 +495,7 @@ uint8_t drv8000_spi_write(st_DRV8000_Interface_t* interface,
     if (0u == ret)
     {
         drv8000_global_spi_status.u8_SpiCommStatus = spi_receive.st_SpiCommand.SpiStastus & DRV8000_GLOBAL_STATUS_MASK;
-        ret = drv8000_check_spi_status();
+        ret = drv8000_spi_status_check();
     }
 
     return ret;
@@ -559,4 +515,57 @@ uint8_t drv8000_gpio_set(st_DRV8000_Interface_t* interface,
                                     pin,
                                     pin_level);
     }
+}
+
+uint8_t drv8000_pwm_set(st_DRV8000_Interface_t* interface,
+                             uint8_t instance,
+                             uint8_t channel,
+                             uint16_t dutycycle
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+                            ,uint16_t period
+#endif
+                            )
+{
+    if (NULL == interface || NULL == interface->fptr_PwmSetDutycycle)
+    {
+        return 1u;
+    }
+#ifdef GDU_PWM_PERIOD_NOT_FIXED
+    if (NULL == interface->fptr_PwmSetPeriod)
+    {
+        return 1u;
+    }
+    if (period > interface->pwm_max_period)
+    {
+        period = interface->pwm_max_period;
+    }
+    if (dutycycle > period)
+    {
+        dutycycle = period;
+    }
+
+    interface->fptr_PwmSetPeriod(instance,
+                                 channel,
+                                 period);
+#else
+    if (dutycycle > interface->pwm_max_period)
+    {
+        dutycycle = interface->pwm_max_period;
+    }
+#endif
+    return interface->fptr_PwmSetDutycycle(instance,
+                                           channel,
+                                           dutycycle);
+}
+
+uint8_t drv8000_delay_set(st_DRV8000_Interface_t* interface,
+                          uint16_t delay_us)
+{
+    if (NULL != interface && NULL != interface->fptr_Delay)
+    {
+        interface->fptr_Delay(delay_us);
+        return 0u;
+    }
+
+    return 1u;
 }
