@@ -18,9 +18,18 @@
 /* ***            Definition of global macros                         ***/
 /* **********************************************************************/
 #define GDU_PWM_PERIOD_FIXED
+
+#define GDU_GD_USED
+#ifdef GDU_GD_USED
+#define GDU_GD_IN2_GPIO
+#endif /* GDU_GD_USED */
+
+#define GDU_HHB_USED
+#ifdef GDU_HHB_USED
 #define GDU_PWM2_USED
-// #define GDU_GD_IN2_GPIO
-// #define GDU_GD_USED
+#endif /* GDU_HHB_USED */
+
+#define GDU_HS_USED
 
 
 /* **********************************************************************/
@@ -60,10 +69,12 @@ typedef struct
     uint16_t pwm_max_period;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
+#ifdef GDU_HHB_USED
 #ifdef GDU_PWM2_USED
 	uint8_t pwm2_instance;
 	uint8_t pwm2_channel;
 #endif /* GDU_PWM2_USED */
+#endif /* GDU_HHB_USED */
 #ifdef GDU_GD_USED
     uint8_t pwm_gd_in1_instance;
     uint8_t pwm_gd_in1_channel;
@@ -530,9 +541,11 @@ typedef enum
 /* ***            Declaration of global functions                     ***/
 /* **********************************************************************/
 /* *** PIN Control *** */
+#ifdef GDU_GD_USED
 uint8_t drv8000_pin_gd_enable(st_DRV8000_Interface_t* interface);
 
 uint8_t drv8000_pin_gd_disable(st_DRV8000_Interface_t* interface);
+#endif /* GDU_GD_USED */
 
 uint8_t drv8000_pin_set_pwm1(st_DRV8000_Interface_t* interface,
                              uint16_t dutycycle
@@ -597,6 +610,7 @@ uint8_t drv8000_ipropi_mode(st_DRV8000_Interface_t* interface,
                             en_IPROPI_SEL_MUX_t ipropi_sel);
 
 /* ** High Side Driver Control ** */
+#ifdef GDU_HS_USED
 uint8_t drv8000_hs_driver_cnfg(st_DRV8000_Interface_t* interface,
                                en_HS_CNFG_t hs_out7_cnfg,
                                en_HS_CNFG_t hs_out8_cnfg,
@@ -659,8 +673,10 @@ uint8_t drv8000_ec_driver_enable(st_DRV8000_Interface_t* interface,
                                  en_HS_EN_t hs_ec_en,
                                  en_EC_ECFB_LS_EN_t es_ecfb_ls_en,
                                  uint8_t ec_v_tar);
+#endif /* GDU_HS_USED */
 
 /* *** Half-bridge Control *** */
+#ifdef GDU_HHB_USED
 /**
  * @brief Configures the control mode of half-bridge outputs OUT1 to OUT4.
  * 
@@ -723,6 +739,7 @@ uint8_t drv8000_hhb_set_fw(st_DRV8000_Interface_t* interface,
                            en_HHB_FW_t hhb_out4_fw,
                            en_HHB_FW_t hhb_out5_fw,
                            en_HHB_FW_t hhb_out6_fw);
+#endif /* GDU_HHB_USED */
 
 /* *** H-bridge Control *** */
 #ifdef GDU_GD_USED

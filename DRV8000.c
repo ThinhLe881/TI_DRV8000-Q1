@@ -616,6 +616,7 @@ uint8_t drv8000_ipropi_mode(st_DRV8000_Interface_t* interface,
 }
 
 /* ** High Side Driver Control ** */
+#ifdef GDU_HS_USED
 uint8_t drv8000_hs_driver_cnfg(st_DRV8000_Interface_t* interface,
                                en_HS_CNFG_t hs_out7_cnfg,
                                en_HS_CNFG_t hs_out8_cnfg,
@@ -847,8 +848,10 @@ uint8_t drv8000_ec_driver_enable(st_DRV8000_Interface_t* interface,
                              DRV8000_ADDREG_HS_EC_HEAT_CTRL,
                              drv8000_reg_map[REGID_HS_EC_HEAT_CTRL]);
 }
+#endif /* GDU_HS_USED */
 
 /* *** Half-bridge Control *** */
+#ifdef GDU_HHB_USED
 /**
  * @brief Configures the control mode of half-bridge outputs OUT1 to OUT4.
  * 
@@ -989,6 +992,7 @@ uint8_t drv8000_hhb_set_fw(st_DRV8000_Interface_t* interface,
                              DRV8000_ADDREG_HB_OUT_CNFG1,
                              drv8000_reg_map[REGID_HB_OUT_CNFG1]);
 }
+#endif /* GDU_HHB_USED */
 
 /* *** H-bridge Control *** */
 #ifdef GDU_GD_USED
