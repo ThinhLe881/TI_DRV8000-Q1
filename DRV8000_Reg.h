@@ -17,6 +17,26 @@
 /* **********************************************************************/
 /* ***           Definition of global plain CONSTants                 ***/
 /* **********************************************************************/
+#ifndef DRV_BYTE_ORDER
+#ifndef __BYTE_ORDER__
+
+#define DRV_LITTLE_ENDIAN               (1234)
+#define DRV_BIG_ENDIAN                  (4321)
+
+/** If __BYTE_ORDER__ is not defined, choose the endianness of your architecture
+ * by uncommenting the define which fits your platform endianness.
+ */
+/* #define DRV_BYTE_ORDER                  (DRV_BIG_ENDIAN) */
+#define DRV_BYTE_ORDER                  (DRV_LITTLE_ENDIAN)
+
+#else /* defined __BYTE_ORDER__ */
+
+#define DRV_LITTLE_ENDIAN               (__ORDER_LITTLE_ENDIAN__)
+#define DRV_BIG_ENDIAN                  (__ORDER_BIG_ENDIAN__)
+#define DRV_BYTE_ORDER                  (__BYTE_ORDER__)
+
+#endif /* __BYTE_ORDER__ */
+#endif /* DRV_BYTE_ORDER */
 
 
 /* ********************************************************************/
@@ -162,6 +182,7 @@
 /* **************************************************************** */
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_ITRIP_TO          : 1;
         uint16_t ITRIP                  : 1;
         uint16_t WD_FLT                 : 1;
@@ -178,10 +199,29 @@ typedef struct
         uint16_t FAULT                  : 1;
         uint16_t POR                    : 1;
         uint16_t SPI_OK                 : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t SPI_OK                 : 1;
+        uint16_t POR                    : 1;
+        uint16_t FAULT                  : 1;
+        uint16_t WARN                   : 1;
+        uint16_t GD                     : 1;
+        uint16_t HB                     : 2;
+        uint16_t EC_HEAT                : 2;
+        uint16_t HS                     : 1;
+        uint16_t PVDD_UV                : 1;
+        uint16_t PVDD_OV                : 2;
+        uint16_t VCP_UV                 : 1;
+        uint16_t OTW                    : 1;
+        uint16_t OTSD                   : 1;
+        uint16_t WD_FLT                 : 1;
+        uint16_t ITRIP                  : 1;
+        uint16_t OUT7_ITRIP_TO          : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_IC_STAT1_R_00h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t ZONE1_OTW_L            : 1;
         uint16_t ZONE2_OTW_L            : 1;
         uint16_t ZONE3_OTW_L            : 1;
@@ -197,10 +237,28 @@ typedef struct
         uint16_t                        : 1;
         uint16_t SCLK_FLT               : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t SCLK_FLT               : 1;
+        uint16_t                        : 1;
+        uint16_t ZONE4_OTSD             : 1;
+        uint16_t ZONE3_OTSD             : 1;
+        uint16_t ZONE2_OTSD             : 1;
+        uint16_t ZONE1_OTSD             : 1;
+        uint16_t ZONE4_OTW_H            : 1;
+        uint16_t ZONE3_OTW_H            : 1;
+        uint16_t ZONE2_OTW_H            : 1;
+        uint16_t ZONE1_OTW_H            : 1;
+        uint16_t ZONE4_OTW_L            : 1;
+        uint16_t ZONE3_OTW_L            : 1;
+        uint16_t ZONE2_OTW_L            : 1;
+        uint16_t ZONE1_OTW_L            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_IC_STAT2_R_01h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t VDS_H1                 : 1;
         uint16_t VDS_L1                 : 1;
         uint16_t VDS_H2                 : 1;
@@ -217,10 +275,29 @@ typedef struct
         uint16_t STC_WARN_R             : 1;
         uint16_t                        : 1;
         uint16_t DRVOFF_STAT            : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t DRVOFF_STAT            : 1;
+        uint16_t                        : 1;
+        uint16_t STC_WARN_R             : 1;
+        uint16_t STC_WARN_F             : 1;
+        uint16_t PCHR_WARN              : 1;
+        uint16_t PDCHR_WARN             : 1;
+        uint16_t IDIR_WARN              : 1;
+        uint16_t IDIR                   : 1;
+        uint16_t VGS_L2                 : 1;
+        uint16_t VGS_H2                 : 1;
+        uint16_t VGS_L1                 : 1;
+        uint16_t VGS_H1                 : 1;
+        uint16_t VDS_L2                 : 1;
+        uint16_t VDS_H2                 : 1;
+        uint16_t VDS_L1                 : 1;
+        uint16_t VDS_H1                 : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_STAT_R_02h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_HS_OCP            : 1;
         uint16_t OUT2_HS_OCP            : 1;
         uint16_t OUT3_HS_OCP            : 1;
@@ -235,10 +312,27 @@ typedef struct
         uint16_t OUT5_LS_OCP            : 1;
         uint16_t OUT6_LS_OCP            : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t OUT6_LS_OCP            : 1;
+        uint16_t OUT5_LS_OCP            : 1;
+        uint16_t OUT4_LS_OCP            : 1;
+        uint16_t OUT3_LS_OCP            : 1;
+        uint16_t OUT2_LS_OCP            : 1;
+        uint16_t OUT1_LS_OCP            : 1;
+        uint16_t                        : 2;
+        uint16_t OUT6_HS_OCP            : 1;
+        uint16_t OUT5_HS_OCP            : 1;
+        uint16_t OUT4_HS_OCP            : 1;
+        uint16_t OUT3_HS_OCP            : 1;
+        uint16_t OUT2_HS_OCP            : 1;
+        uint16_t OUT1_HS_OCP            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_STAT1_R_03h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_OLA               : 1;
         uint16_t OUT2_OLA               : 1;
         uint16_t OUT3_OLA               : 1;
@@ -248,10 +342,22 @@ typedef struct
         uint16_t                        : 2;
         uint16_t HB_OLP_STAT            : 1;
         uint16_t                        : 7;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 7;
+        uint16_t HB_OLP_STAT            : 1;
+        uint16_t                        : 2;
+        uint16_t OUT6_OLA               : 1;
+        uint16_t OUT5_OLA               : 1;
+        uint16_t OUT4_OLA               : 1;
+        uint16_t OUT3_OLA               : 1;
+        uint16_t OUT2_OLA               : 1;
+        uint16_t OUT1_OLA               : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_STAT2_R_04h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_ITRIP_STAT        : 1;
         uint16_t OUT2_ITRIP_STAT        : 1;
         uint16_t OUT3_ITRIP_STAT        : 1;
@@ -268,10 +374,29 @@ typedef struct
         uint16_t ECFB_HI                : 1;
         uint16_t ECFB_OV                : 1;
         uint16_t ECFB_UV                : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t ECFB_UV                : 1;
+        uint16_t ECFB_OV                : 1;
+        uint16_t ECFB_HI                : 1;
+        uint16_t ECFB_LO                : 1;
+        uint16_t ECFB_OC                : 1;
+        uint16_t ECFB_OL                : 1;
+        uint16_t HEAT_OL                : 1;
+        uint16_t HEAT_VDS               : 1;
+        uint16_t OUT7_ITRIP_TO          : 1;
+        uint16_t OUT7_ITRIP_STAT        : 1;
+        uint16_t OUT6_ITRIP_STAT        : 1;
+        uint16_t OUT5_ITRIP_STAT        : 1;
+        uint16_t OUT4_ITRIP_STAT        : 1;
+        uint16_t OUT3_ITRIP_STAT        : 1;
+        uint16_t OUT2_ITRIP_STAT        : 1;
+        uint16_t OUT1_ITRIP_STAT        : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_EC_HEAT_ITRIP_STAT_R_05h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_OCP               : 1;
         uint16_t OUT8_OCP               : 1;
         uint16_t OUT9_OCP               : 1;
@@ -286,6 +411,22 @@ typedef struct
         uint16_t OUT10_OLA              : 1;
         uint16_t OUT12_OLA              : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t OUT12_OLA              : 1;
+        uint16_t OUT10_OLA              : 1;
+        uint16_t OUT11_OLA              : 1;
+        uint16_t OUT9_OLA               : 1;
+        uint16_t OUT8_OLA               : 1;
+        uint16_t OUT7_OLA               : 1;
+        uint16_t                        : 2;
+        uint16_t OUT12_OCP              : 1;
+        uint16_t OUT11_OCP              : 1;
+        uint16_t OUT10_OCP              : 1;
+        uint16_t OUT9_OCP               : 1;
+        uint16_t OUT8_OCP               : 1;
+        uint16_t OUT7_OCP               : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_STAT_R_06h_t;
 
 /*
@@ -296,8 +437,13 @@ typedef struct
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t DEVICE_ID              : 8;
         uint16_t                        : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 8;
+        uint16_t DEVICE_ID              : 8;
+#endif // DRV_BYTE_ORDER //
 } REG_SPARE_STAT2_R_08h_t;
 */
 
@@ -306,6 +452,7 @@ typedef struct
 /* **************************************************************** */
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t EN_SSC                 : 1;
         uint16_t WD_WIN                 : 1;
         uint16_t WD_FLT_M               : 1;
@@ -319,10 +466,26 @@ typedef struct
         uint16_t PVDD_OV_MODE           : 2;
         uint16_t DIS_CP                 : 1;
         uint16_t OTSD_MODE              : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t OTSD_MODE              : 1;
+        uint16_t DIS_CP                 : 1;
+        uint16_t PVDD_OV_MODE           : 2;
+        uint16_t PVDD_OV_DG             : 2;
+        uint16_t PVDD_OV_LVL            : 1;
+        uint16_t VCP_UV_LVL             : 1;
+        uint16_t CP_MODE                : 2;
+        uint16_t VCP_UV_MODE            : 1;
+        uint16_t PVDD_UV_MODE           : 1;
+        uint16_t WD_EN                  : 1;
+        uint16_t WD_FLT_M               : 1;
+        uint16_t WD_WIN                 : 1;
+        uint16_t EN_SSC                 : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_IC_CNFG1_RW_09h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t ZONE1_OTW_L_DIS        : 1;
         uint16_t ZONE2_OTW_L_DIS        : 1;
         uint16_t ZONE3_OTW_L_DIS        : 1;
@@ -332,10 +495,22 @@ typedef struct
         uint16_t ZONE3_OTW_H_DIS        : 1;
         uint16_t ZONE4_OTW_H_DIS        : 1;
         uint16_t                        : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 8;
+        uint16_t ZONE4_OTW_H_DIS        : 1;
+        uint16_t ZONE3_OTW_H_DIS        : 1;
+        uint16_t ZONE2_OTW_H_DIS        : 1;
+        uint16_t ZONE1_OTW_H_DIS        : 1;
+        uint16_t ZONE4_OTW_L_DIS        : 1;
+        uint16_t ZONE3_OTW_L_DIS        : 1;
+        uint16_t ZONE2_OTW_L_DIS        : 1;
+        uint16_t ZONE1_OTW_L_DIS        : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_IC_CNFG2_RW_0Ah_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t EN_GD                  : 1;
         uint16_t EN_OLSC                : 1;
         uint16_t BRG_MODE               : 2;
@@ -350,18 +525,42 @@ typedef struct
         uint16_t DRV_LO2                : 1;
         uint16_t DRV_LO1                : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t DRV_LO1                : 1;
+        uint16_t DRV_LO2                : 1;
+        uint16_t PU_SH_1                : 1;
+        uint16_t PD_SH_1                : 1;
+        uint16_t PU_SH_2                : 1;
+        uint16_t PD_SH_2                : 1;
+        uint16_t                        : 1;
+        uint16_t IN2_MODE               : 1;
+        uint16_t IN1_MODE               : 1;
+        uint16_t BRG_FW                 : 1;
+        uint16_t BRG_MODE               : 2;
+        uint16_t EN_OLSC                : 1;
+        uint16_t EN_GD                  : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_CNFG_RW_0Bh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t IDRVN_2                 : 4;
         uint16_t IDRVP_2                 : 4;
         uint16_t IDRVN_1                 : 4;
         uint16_t IDRVP_1                 : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t IDRVP_1                 : 4;
+        uint16_t IDRVN_1                 : 4;
+        uint16_t IDRVP_2                 : 4;
+        uint16_t IDRVN_2                 : 4;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_IDRV_CNFG_RW_0Ch_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t VGS_MODE               : 2;
         uint16_t VGS_LVL                : 1;
         uint16_t VGS_HS_DIS             : 1;
@@ -370,10 +569,21 @@ typedef struct
         uint16_t VGS_TDEAD              : 2;
         uint16_t VGS_IND                : 1;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t VGS_IND                : 1;
+        uint16_t VGS_TDEAD              : 2;
+        uint16_t                        : 2;
+        uint16_t VGS_TDRV               : 3;
+        uint16_t VGS_HS_DIS             : 1;
+        uint16_t VGS_LVL                : 1;
+        uint16_t VGS_MODE               : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_VGS_CNFG_RW_0Dh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t VDS_LVL_2              : 4;
         uint16_t VDS_DG                 : 2;
         uint16_t VDS_MODE               : 2;
@@ -381,20 +591,39 @@ typedef struct
         uint16_t VDS_IDRVN              : 2;
         uint16_t VDS_IND                : 1;
         uint16_t                        : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 1;
+        uint16_t VDS_IND                : 1;
+        uint16_t VDS_IDRVN              : 2;
+        uint16_t VDS_LVL_1              : 4;
+        uint16_t VDS_MODE               : 2;
+        uint16_t VDS_DG                 : 2;
+        uint16_t VDS_LVL_2              : 4;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_VDS_CNFG_RW_0Eh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t                        : 1;
         uint16_t CSA_DIV                : 1;
         uint16_t CSA_GAIN               : 2;
         uint16_t CSA_BLK_SEL            : 1;
         uint16_t CSA_BLK                : 3;
         uint16_t                        : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 8;
+        uint16_t CSA_BLK                : 3;
+        uint16_t CSA_BLK_SEL            : 1;
+        uint16_t CSA_GAIN               : 2;
+        uint16_t CSA_DIV                : 1;
+        uint16_t                        : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_CSA_CNFG_RW_0Fh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t EN_PDR                 : 1;
         uint16_t KP_PDR                 : 2;
         uint16_t EN_PST_DLY             : 1;
@@ -407,25 +636,56 @@ typedef struct
         uint16_t AGD_ISTRONG            : 2;
         uint16_t PDR_ERR                : 1;
         uint16_t                        : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 1;
+        uint16_t PDR_ERR                : 1;
+        uint16_t AGD_ISTRONG            : 2;
+        uint16_t AGD_THR                : 2;
+        uint16_t SET_AGD                : 1;
+        uint16_t FW_MAX                 : 1;
+        uint16_t EN_DCC                 : 1;
+        uint16_t IDIR_MAN               : 1;
+        uint16_t KP_PST                 : 2;
+        uint16_t EN_PST_DLY             : 1;
+        uint16_t KP_PDR                 : 2;
+        uint16_t EN_PDR                 : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_AGD_CNFG_RW_10h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t PRE_DCHR_INIT          : 2;
         uint16_t PRE_CHR_INIT           : 2;
         uint16_t T_PRE_DCHR             : 2;
         uint16_t T_PRE_CHR              : 2;
         uint16_t T_DON_DOFF             : 6;
         uint16_t PRE_MAX                : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t PRE_MAX                : 2;
+        uint16_t T_DON_DOFF             : 6;
+        uint16_t T_PRE_CHR              : 2;
+        uint16_t T_PRE_DCHR             : 2;
+        uint16_t PRE_CHR_INIT           : 2;
+        uint16_t PRE_DCHR_INIT          : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_PDR_CNFG_RW_11h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t EN_STC                 : 1;
         uint16_t KP_STC                 : 2;
         uint16_t STC_ERR                : 1;
         uint16_t T_RISE_FALL            : 4;
         uint16_t                        : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 8;
+        uint16_t T_RISE_FALL            : 4;
+        uint16_t STC_ERR                : 1;
+        uint16_t KP_STC                 : 2;
+        uint16_t EN_STC                 : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_STC_CNFG_RW_12h_t;
 
 /*
@@ -437,6 +697,7 @@ typedef struct
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_ITRIP_DG          : 2;
         uint16_t OUT2_ITRIP_DG          : 2;
         uint16_t OUT3_ITRIP_DG          : 2;
@@ -444,10 +705,20 @@ typedef struct
         uint16_t OUT5_ITRIP_DG          : 2;
         uint16_t OUT6_ITRIP_DG          : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t OUT6_ITRIP_DG          : 2;
+        uint16_t OUT5_ITRIP_DG          : 2;
+        uint16_t OUT4_ITRIP_DG          : 2;
+        uint16_t OUT3_ITRIP_DG          : 2;
+        uint16_t OUT2_ITRIP_DG          : 2;
+        uint16_t OUT1_ITRIP_DG          : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_ITRIP_DG_RW_14h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT5_CNFG              : 3;
         uint16_t OUT6_CNFG              : 3;
         uint16_t                        : 2;
@@ -459,20 +730,43 @@ typedef struct
         uint16_t NSR_OUT5_DIS           : 1;
         uint16_t NSR_OUT6_DIS           : 1;
         uint16_t                        : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 1;
+        uint16_t NSR_OUT6_DIS           : 1;
+        uint16_t NSR_OUT5_DIS           : 1;
+        uint16_t NSR_OUT4_DIS           : 1;
+        uint16_t NSR_OUT3_DIS           : 1;
+        uint16_t NSR_OUT2_DIS           : 1;
+        uint16_t NSR_OUT1_DIS           : 1;
+        uint16_t IPROPI_SH_EN           : 1;
+        uint16_t                        : 2;
+        uint16_t OUT6_CNFG              : 3;
+        uint16_t OUT5_CNFG              : 3;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_OUT_CNFG1_RW_15h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_CNFG              : 3;
         uint16_t OUT2_CNFG              : 3;
         uint16_t                        : 2;
         uint16_t OUT3_CNFG              : 3;
         uint16_t OUT4_CNFG              : 3;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t OUT4_CNFG              : 3;
+        uint16_t OUT3_CNFG              : 3;
+        uint16_t                        : 2;
+        uint16_t OUT2_CNFG              : 3;
+        uint16_t OUT1_CNFG              : 3;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_OUT_CNFG2_RW_16h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_OCP_DG            : 2;
         uint16_t OUT2_OCP_DG            : 2;
         uint16_t OUT3_OCP_DG            : 2;
@@ -480,10 +774,20 @@ typedef struct
         uint16_t OUT5_OCP_DG            : 2;
         uint16_t OUT6_OCP_DG            : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t OUT6_OCP_DG            : 2;
+        uint16_t OUT5_OCP_DG            : 2;
+        uint16_t OUT4_OCP_DG            : 2;
+        uint16_t OUT3_OCP_DG            : 2;
+        uint16_t OUT2_OCP_DG            : 2;
+        uint16_t OUT1_OCP_DG            : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_OCP_CNFG_RW_17h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_OLA_EN            : 1;
         uint16_t OUT2_OLA_EN            : 1;
         uint16_t OUT3_OLA_EN            : 1;
@@ -494,10 +798,23 @@ typedef struct
         uint16_t HB_OLP_SEL             : 4;
         uint16_t HB_OLP_CNFG            : 2;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t HB_OLP_CNFG            : 2;
+        uint16_t HB_OLP_SEL             : 4;
+        uint16_t                        : 2;
+        uint16_t OUT6_OLA_EN            : 1;
+        uint16_t OUT5_OLA_EN            : 1;
+        uint16_t OUT4_OLA_EN            : 1;
+        uint16_t OUT3_OLA_EN            : 1;
+        uint16_t OUT2_OLA_EN            : 1;
+        uint16_t OUT1_OLA_EN            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_OL_CNFG1_RW_18h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_OLA_TH            : 1;
         uint16_t OUT2_OLA_TH            : 1;
         uint16_t OUT3_OLA_TH            : 1;
@@ -505,10 +822,20 @@ typedef struct
         uint16_t OUT5_OLA_TH            : 1;
         uint16_t OUT6_OLA_TH            : 1;
         uint16_t                        : 10;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 10;
+        uint16_t OUT6_OLA_TH            : 1;
+        uint16_t OUT5_OLA_TH            : 1;
+        uint16_t OUT4_OLA_TH            : 1;
+        uint16_t OUT3_OLA_TH            : 1;
+        uint16_t OUT2_OLA_TH            : 1;
+        uint16_t OUT1_OLA_TH            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_OL_CNFG2_RW_19h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_SR                : 2;
         uint16_t OUT2_SR                : 2;
         uint16_t OUT3_SR                : 2;
@@ -516,11 +843,21 @@ typedef struct
         uint16_t OUT5_SR                : 2;
         uint16_t OUT6_SR                : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t OUT6_SR                : 2;
+        uint16_t OUT5_SR                : 2;
+        uint16_t OUT4_SR                : 2;
+        uint16_t OUT3_SR                : 2;
+        uint16_t OUT2_SR                : 2;
+        uint16_t OUT1_SR                : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_SR_CNFG_RW_1Ah_t;
 
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_ITRIP_LVL         : 1;
         uint16_t OUT2_ITRIP_LVL         : 1;
         uint16_t OUT3_ITRIP_LVL         : 2;
@@ -533,10 +870,25 @@ typedef struct
         uint16_t OUT4_ITRIP_EN          : 1;
         uint16_t OUT5_ITRIP_EN          : 1;
         uint16_t OUT6_ITRIP_EN          : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t OUT6_ITRIP_EN          : 1;
+        uint16_t OUT5_ITRIP_EN          : 1;
+        uint16_t OUT4_ITRIP_EN          : 1;
+        uint16_t OUT3_ITRIP_EN          : 1;
+        uint16_t OUT2_ITRIP_EN          : 1;
+        uint16_t OUT1_ITRIP_EN          : 1;
+        uint16_t OUT6_ITRIP_LVL         : 2;
+        uint16_t OUT5_ITRIP_LVL         : 2;
+        uint16_t OUT4_ITRIP_LVL         : 2;
+        uint16_t OUT3_ITRIP_LVL         : 2;
+        uint16_t OUT2_ITRIP_LVL         : 1;
+        uint16_t OUT1_ITRIP_LVL         : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_ITRIP_CNFG_RW_1Bh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT1_ITRIP_FREQ        : 2;
         uint16_t OUT2_ITRIP_FREQ        : 2;
         uint16_t OUT3_ITRIP_FREQ        : 2;
@@ -544,10 +896,20 @@ typedef struct
         uint16_t OUT5_ITRIP_FREQ        : 2;
         uint16_t OUT6_ITRIP_FREQ        : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t OUT6_ITRIP_FREQ        : 2;
+        uint16_t OUT5_ITRIP_FREQ        : 2;
+        uint16_t OUT4_ITRIP_FREQ        : 2;
+        uint16_t OUT3_ITRIP_FREQ        : 2;
+        uint16_t OUT2_ITRIP_FREQ        : 2;
+        uint16_t OUT1_ITRIP_FREQ        : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HB_ITRIP_FREQ_RW_1Ch_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_CNFG              : 2;
         uint16_t OUT8_CNFG              : 2;
         uint16_t OUT9_CNFG              : 2;
@@ -556,10 +918,21 @@ typedef struct
         uint16_t OUT12_CNFG             : 2;
         uint16_t                        : 2;
         uint16_t HEAT_OUT_CNFG          : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t HEAT_OUT_CNFG          : 2;
+        uint16_t                        : 2;
+        uint16_t OUT12_CNFG             : 2;
+        uint16_t OUT11_CNFG             : 2;
+        uint16_t OUT10_CNFG             : 2;
+        uint16_t OUT9_CNFG              : 2;
+        uint16_t OUT8_CNFG              : 2;
+        uint16_t OUT7_CNFG              : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_HEAT_OUT_CNFG_RW_1Dh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_RDSON_MODE        : 1;
         uint16_t OUT8_OC_TH             : 1;
         uint16_t OUT9_OC_TH             : 1;
@@ -569,10 +942,22 @@ typedef struct
         uint16_t                        : 6;
         uint16_t OUT11_EC_MODE          : 1;
         uint16_t                        : 3;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 3;
+        uint16_t OUT11_EC_MODE          : 1;
+        uint16_t                        : 6;
+        uint16_t OUT12_OC_TH            : 1;
+        uint16_t OUT11_OC_TH            : 1;
+        uint16_t OUT10_OC_TH            : 1;
+        uint16_t OUT9_OC_TH             : 1;
+        uint16_t OUT8_OC_TH             : 1;
+        uint16_t OUT7_RDSON_MODE        : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_OC_CNFG_RW_1Eh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_OLA_EN            : 1;
         uint16_t OUT8_OLA_EN            : 1;
         uint16_t OUT9_OLA_EN            : 1;
@@ -587,10 +972,27 @@ typedef struct
         uint16_t OUT11_OLA_TH           : 1;
         uint16_t OUT12_OLA_TH           : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t OUT12_OLA_TH           : 1;
+        uint16_t OUT11_OLA_TH           : 1;
+        uint16_t OUT10_OLA_TH           : 1;
+        uint16_t OUT9_OLA_TH            : 1;
+        uint16_t OUT8_OLA_TH            : 1;
+        uint16_t OUT7_OLA_TH            : 1;
+        uint16_t                        : 2;
+        uint16_t OUT12_OLA_EN           : 1;
+        uint16_t OUT11_OLA_EN           : 1;
+        uint16_t OUT10_OLA_EN           : 1;
+        uint16_t OUT9_OLA_EN            : 1;
+        uint16_t OUT8_OLA_EN            : 1;
+        uint16_t OUT7_OLA_EN            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_OL_CNFG_RW_1Fh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_ITRIP_DG          : 2;
         uint16_t OUT7_ITRIP_FREQ        : 2;
         uint16_t OUT7_ITRIP_BLK         : 2;
@@ -598,10 +1000,20 @@ typedef struct
         uint16_t ITRIP_TO_SEL           : 2;
         uint16_t OUT7_OCP_DIS           : 1;
         uint16_t                        : 5;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 5;
+        uint16_t OUT7_OCP_DIS           : 1;
+        uint16_t ITRIP_TO_SEL           : 2;
+        uint16_t OUT7_ITRIP_CNFG        : 2;
+        uint16_t OUT7_ITRIP_BLK         : 2;
+        uint16_t OUT7_ITRIP_FREQ        : 2;
+        uint16_t OUT7_ITRIP_DG          : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_REG_CNFG1_RW_20h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_CCM_EN            : 1;
         uint16_t OUT8_CCM_EN            : 1;
         uint16_t OUT9_CCM_EN            : 1;
@@ -616,10 +1028,27 @@ typedef struct
         uint16_t OUT11_CCM_TO           : 1;
         uint16_t OUT12_CCM_TO           : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t OUT12_CCM_TO           : 1;
+        uint16_t OUT11_CCM_TO           : 1;
+        uint16_t OUT10_CCM_TO           : 1;
+        uint16_t OUT9_CCM_TO            : 1;
+        uint16_t OUT8_CCM_TO            : 1;
+        uint16_t OUT7_CCM_TO            : 1;
+        uint16_t                        : 2;
+        uint16_t OUT12_CCM_EN           : 1;
+        uint16_t OUT11_CCM_EN           : 1;
+        uint16_t OUT10_CCM_EN           : 1;
+        uint16_t OUT9_CCM_EN            : 1;
+        uint16_t OUT8_CCM_EN            : 1;
+        uint16_t OUT7_CCM_EN            : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_REG_CNFG2_RW_21h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t PWM_OUT7_FREQ          : 2;
         uint16_t PWM_OUT8_FREQ          : 2;
         uint16_t PWM_OUT9_FREQ          : 2;
@@ -627,10 +1056,20 @@ typedef struct
         uint16_t PWM_OUT11_FREQ         : 2;
         uint16_t PWM_OUT12_FREQ         : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t PWM_OUT12_FREQ         : 2;
+        uint16_t PWM_OUT11_FREQ         : 2;
+        uint16_t PWM_OUT10_FREQ         : 2;
+        uint16_t PWM_OUT9_FREQ          : 2;
+        uint16_t PWM_OUT8_FREQ          : 2;
+        uint16_t PWM_OUT7_FREQ          : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_PWM_FREQ_CNFG_RW_22h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t                        : 1;
         uint16_t HEAT_OLP_EN            : 1;
         uint16_t HEAT_VDS_DG            : 2;
@@ -638,10 +1077,20 @@ typedef struct
         uint16_t HEAT_VDS_MODE          : 2;
         uint16_t HEAT_VDS_LVL           : 4;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t HEAT_VDS_LVL           : 4;
+        uint16_t HEAT_VDS_MODE          : 2;
+        uint16_t HEAT_VDS_BLK           : 2;
+        uint16_t HEAT_VDS_DG            : 2;
+        uint16_t HEAT_OLP_EN            : 1;
+        uint16_t                        : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HEAT_CNFG_RW_23h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t ECFB_MAX               : 1;
         uint16_t EC_OLEN                : 1;
         uint16_t ECFB_LS_PWM            : 1;
@@ -653,10 +1102,24 @@ typedef struct
         uint16_t                        : 2;
         uint16_t ECFB_UV_TH             : 1;
         uint16_t ECDRV_OL_EN            : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t ECDRV_OL_EN            : 1;
+        uint16_t ECFB_UV_TH             : 1;
+        uint16_t                        : 2;
+        uint16_t ECFB_UV_DG             : 2;
+        uint16_t ECFB_OV_DG             : 2;
+        uint16_t ECFB_UV_MODE           : 2;
+        uint16_t ECFB_OV_MODE           : 2;
+        uint16_t EC_FLT_MODE            : 1;
+        uint16_t ECFB_LS_PWM            : 1;
+        uint16_t EC_OLEN                : 1;
+        uint16_t ECFB_MAX               : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_EC_CNFG_RW_24h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_OCP_DG            : 2;
         uint16_t OUT8_OCP_DG            : 2;
         uint16_t OUT9_OCP_DG            : 2;
@@ -664,6 +1127,15 @@ typedef struct
         uint16_t OUT11_OCP_DG           : 2;
         uint16_t OUT12_OCP_DG           : 2;
         uint16_t                        : 4;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 4;
+        uint16_t OUT12_OCP_DG           : 2;
+        uint16_t OUT11_OCP_DG           : 2;
+        uint16_t OUT10_OCP_DG           : 2;
+        uint16_t OUT9_OCP_DG            : 2;
+        uint16_t OUT8_OCP_DG            : 2;
+        uint16_t OUT7_OCP_DG            : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_OCP_DG_RW_25h_t;
 
 /*
@@ -688,6 +1160,7 @@ typedef struct
 /* **************************************************************** */
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t CLR_FLT                : 1;
         uint16_t WD_RST                 : 1;
         uint16_t CNFG_LOCK              : 3;
@@ -695,10 +1168,20 @@ typedef struct
         uint16_t IPROPI_SEL             : 5;
         uint16_t IPROPI_MODE            : 1;
         uint16_t                        : 2;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 2;
+        uint16_t IPROPI_MODE            : 1;
+        uint16_t IPROPI_SEL             : 5;
+        uint16_t CTRL_LOCK              : 3;
+        uint16_t CNFG_LOCK              : 3;
+        uint16_t WD_RST                 : 1;
+        uint16_t CLR_FLT                : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_IC_CTRL_RW_29h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT2_CTRL              : 2;
         uint16_t OUT1_CTRL              : 2;
         uint16_t OUT3_CTRL              : 2;
@@ -709,10 +1192,23 @@ typedef struct
         uint16_t S_IN2                  : 1;
         uint16_t S_HIZ1                 : 1;
         uint16_t S_HIZ2                 : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t S_HIZ2                 : 1;
+        uint16_t S_HIZ1                 : 1;
+        uint16_t S_IN2                  : 1;
+        uint16_t S_IN1                  : 1;
+        uint16_t OUT6_CTRL              : 2;
+        uint16_t OUT5_CTRL              : 2;
+        uint16_t OUT4_CTRL              : 2;
+        uint16_t OUT3_CTRL              : 2;
+        uint16_t OUT1_CTRL              : 2;
+        uint16_t OUT2_CTRL              : 2;
+#endif /* DRV_BYTE_ORDER */
 } REG_GD_HB_CTRL_RW_2Ah_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_EN                : 1;
         uint16_t OUT8_EN                : 1;
         uint16_t OUT9_EN                : 1;
@@ -724,42 +1220,85 @@ typedef struct
         uint16_t EC_V_TAR               : 6;
         uint16_t EC_ON                  : 1;
         uint16_t ECFB_LS_EN             : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t ECFB_LS_EN             : 1;
+        uint16_t EC_ON                  : 1;
+        uint16_t EC_V_TAR               : 6;
+        uint16_t HEAT_EN                : 1;
+        uint16_t                        : 1;
+        uint16_t OUT12_EN               : 1;
+        uint16_t OUT11_EN               : 1;
+        uint16_t OUT10_EN               : 1;
+        uint16_t OUT9_EN                : 1;
+        uint16_t OUT8_EN                : 1;
+        uint16_t OUT7_EN                : 1;
+#endif /* DRV_BYTE_ORDER */
 } REG_HS_EC_HEAT_CTRL_RW_2Bh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT7_DC                : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT7_DC                : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT7_PWM_DC_RW_2Ch_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT8_DC                : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT8_DC                : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT8_PWM_DC_RW_2Dh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT9_DC                : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT9_DC                : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT9_PWM_DC_RW_2Eh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT10_DC               : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT10_DC               : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT10_PWM_DC_RW_2Fh_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT11_DC               : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT11_DC               : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT11_PWM_DC_RW_30h_t;
 
 typedef struct
 {
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
         uint16_t OUT12_DC               : 10;
         uint16_t                        : 6;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+        uint16_t                        : 6;
+        uint16_t OUT12_DC               : 10;
+#endif /* DRV_BYTE_ORDER */
 } REG_OUT12_PWM_DC_RW_31h_t;
 
 
