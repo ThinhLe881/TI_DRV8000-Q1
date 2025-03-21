@@ -3,7 +3,7 @@
 ## Introduction
 
 <p align="justify">&bull; Embedded software driver for Texas Instruments - DRV8000-Q1 written in C programming language. This repository contains the software driver files (.h and .c) to be included, or linked directly as a git submodule, in your project.</p>
-<p align="justify">&bull; The device datasheet can be found [here](https://www.ti.com/product/DRV8000-Q1).</p>
+<p style="text-align: justify;">&bull; The device datasheet can be found <a href="https://www.ti.com/product/DRV8000-Q1">here</a>.</p>
 
 ## Integration
 
