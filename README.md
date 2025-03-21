@@ -8,6 +8,8 @@
 
 ## Integration
 
--   The software driver is platform-independent, you only need to define and set the device interface - `st_DRV8000_Interface_t`.
+-   The software driver is platform-independent, you only need to define and set the device interface - `st_DRV8000_Interface_t`. This interface consists of a SPI transmit/receive function, PWM period and duty cycle functions, a GPIO function, and a delay function. Additionally, the device interface consists of pin instances and channel definitions for the PWM and GPIO. Collectively these interfaces are encapsulated into a `struct` for software development.
 
--   The device interface consists of a SPI transmit/receive function, PWM period and duty cycle functions, a GPIO function, and a delay function. Additionally, the device interface consists of pin instances and channel definitions for the PWM and GPIO. Collectively these interfaces are encapsulated into a `struct` for software development.
+-   Include in your project the software driver files for the device (.h and .c).
+
+-   Define in your code the necessary functions for communicating with the device, and define the device interface instance, and set it using the `void drv8000_interface_set(st_DRV8000_Interface_t* interface)` function.
