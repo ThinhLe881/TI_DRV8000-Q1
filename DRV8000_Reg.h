@@ -52,7 +52,7 @@
 #define DRV8000_ADDREG_GD_STAT                      0x02u
 #define DRV8000_ADDREG_HB_STAT1                     0x03u
 #define DRV8000_ADDREG_HB_STAT2                     0x04u
-#define DRV8000_ADDREG_EC_HEAT_IT_RIP_STAT          0x05u
+#define DRV8000_ADDREG_EC_HEAT_ITRIP_STAT           0x05u
 #define DRV8000_ADDREG_HS_STAT                      0x06u
 #define DRV8000_ADDREG_SPARE_STAT1                  0x07u
 #define DRV8000_ADDREG_DEVICE_ID                    0x08u

@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #include "DRV8000.h"
-#include "DRV8000_Registers.h"
+#include "DRV8000_Reg.h"
 
 
 /* **********************************************************************/
