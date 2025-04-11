@@ -47,7 +47,7 @@
 #define DRV8000_SPI_FRAME_LEN                                   4u          /* 24 bits + 8 bits padding = 4 8-bit buffers */
 #define DRV8000_SUCCESS_SPI_STATUS                              0xC0u       /* 1 1 0     0    0     0   0    0       */
                                                                             /* 1 1 FAULT WARN OV_UV DRV OTSD SPI_ERR */
-#define DRV8000_REG_NOT_CHANGE                                  0x1FFFF     /* Flag for unchange bits, only for certain bitfields */
+#define BITS_NOT_CHANGE                                         0x1FFFF     /* Flag for unchange bits, only for certain bitfields */
 #define PIN_LOW                                                 0u
 #define PIN_HIGH                                                1u
 
@@ -281,14 +281,14 @@ typedef enum
     HS_CNFG_SPI_CONTROL,
     HS_CNFG_PWM_PIN_CONTROL,
     HS_CNFG_PWM_GEN,
-    HS_CNFG_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HS_CNFG_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HS_CNFG_t;
 
 typedef enum
 {
     HS_DISABLE,
     HS_ENABLE,
-    HS_EN_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HS_EN_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HS_EN_t;
 
 typedef enum
@@ -303,7 +303,7 @@ typedef enum
     HS_CCM_200mA_20ms,
     HS_CCM_390mA_10ms,
     HS_CCM_DISABLE,
-    HS_CCM_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HS_CCM_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HS_CCM_t;
 
 typedef enum
@@ -377,7 +377,7 @@ typedef enum
     HEATER_CNFG_DISABLED,
     HEATER_CNFG_SPI_CONTROL,
     HEATER_CNFG_PWM_PIN_CONTROL,
-    HEATER_CNFG_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HEATER_CNFG_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HEATER_CNFG_t;
 
 /* *** Electrochromic Driver Control *** */
@@ -459,7 +459,7 @@ typedef enum
     HHB_PWM2_COMP,
     HHB_PWM2_LS,
     HHB_PWM2_HS,
-    HHB_CNFG_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HHB_CNFG_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HHB_CNFG_t;
 
 typedef enum
@@ -467,7 +467,7 @@ typedef enum
     HHB_OFF,
     HHB_HS_ON,
     HHB_LS_ON,
-    HHB_EN_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+    HHB_EN_BITS_NOT_CHANGE = BITS_NOT_CHANGE,
 } en_HHB_EN_t;
 
 typedef enum

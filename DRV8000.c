@@ -385,31 +385,31 @@ en_DRV8000_STST_t drv8000_hs_driver_cnfg(en_HS_CNFG_t hs_out7_cnfg,
 
     reg_data = drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG];
 
-    if (DRV8000_REG_NOT_CHANGE != hs_out7_cnfg)
+    if (BITS_NOT_CHANGE != hs_out7_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT7_CNFG = hs_out7_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out8_cnfg)
+    if (BITS_NOT_CHANGE != hs_out8_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT8_CNFG = hs_out8_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out9_cnfg)
+    if (BITS_NOT_CHANGE != hs_out9_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT9_CNFG = hs_out9_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out10_cnfg)
+    if (BITS_NOT_CHANGE != hs_out10_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT10_CNFG = hs_out10_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out11_cnfg)
+    if (BITS_NOT_CHANGE != hs_out11_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT11_CNFG = hs_out11_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out12_cnfg)
+    if (BITS_NOT_CHANGE != hs_out12_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.OUT12_CNFG = hs_out12_cnfg;
     }
-    if (HEATER_CNFG_REG_NOT_CHANGE != hs_heater_cnfg)
+    if (BITS_NOT_CHANGE != hs_heater_cnfg)
     {
         reg_data.Reg_HS_HEAT_OUT_CNFG.HEAT_OUT_CNFG = hs_heater_cnfg;
     }
@@ -438,31 +438,31 @@ en_DRV8000_STST_t drv8000_hs_driver_spi_enable(en_HS_EN_t hs_out7_en,
 
     reg_data = drv8000_reg_map[REGID_HS_EC_HEAT_CTRL];
 
-    if (DRV8000_REG_NOT_CHANGE != hs_out7_en)
+    if (BITS_NOT_CHANGE != hs_out7_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT7_EN = hs_out7_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out8_en)
+    if (BITS_NOT_CHANGE != hs_out8_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT8_EN = hs_out8_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out9_en)
+    if (BITS_NOT_CHANGE != hs_out9_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT9_EN = hs_out9_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out10_en)
+    if (BITS_NOT_CHANGE != hs_out10_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT10_EN = hs_out10_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out11_en)
+    if (BITS_NOT_CHANGE != hs_out11_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT11_EN = hs_out11_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_out12_en)
+    if (BITS_NOT_CHANGE != hs_out12_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT12_EN = hs_out12_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hs_heater_en)
+    if (BITS_NOT_CHANGE != hs_heater_en)
     {
         reg_data.Reg_HS_EC_HEAT_CTRL.OUT12_EN = hs_out12_en;
     }
@@ -584,7 +584,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
     ret = drv8000_spi_read(DRV8000_ADDREG_HS_REG_CNFG2,
                             &reg_data);
     
-    if (HS_CCM_REG_NOT_CHANGE != hs_out7_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out7_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out7_ccm_en)
         {
@@ -596,7 +596,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
             reg_data.Reg_HS_REG_CNFG2.OUT7_CCM_EN = 1u;
         }
     }
-    if (HS_CCM_REG_NOT_CHANGE != hs_out8_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out8_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out8_ccm_en)
         {
@@ -608,7 +608,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
             reg_data.Reg_HS_REG_CNFG2.OUT8_CCM_EN = 1u;
         }
     }
-    if (HS_CCM_REG_NOT_CHANGE != hs_out9_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out9_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out9_ccm_en)
         {
@@ -620,7 +620,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
             reg_data.Reg_HS_REG_CNFG2.OUT9_CCM_EN = 1u;
         }
     }
-    if (HS_CCM_REG_NOT_CHANGE != hs_out10_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out10_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out10_ccm_en)
         {
@@ -632,7 +632,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
             reg_data.Reg_HS_REG_CNFG2.OUT10_CCM_EN = 1u;
         }
     }
-    if (HS_CCM_REG_NOT_CHANGE != hs_out11_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out11_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out11_ccm_en)
         {
@@ -644,7 +644,7 @@ en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
             reg_data.Reg_HS_REG_CNFG2.OUT11_CCM_EN = 1u;
         }
     }
-    if (HS_CCM_REG_NOT_CHANGE != hs_out12_ccm_en)
+    if (BITS_NOT_CHANGE != hs_out12_ccm_en)
     {
         if (HS_CCM_DISABLE == hs_out12_ccm_en)
         {
@@ -735,19 +735,19 @@ en_DRV8000_STST_t drv8000_hhb_out1234_set_mode(en_HHB_CNFG_t hhb_out1_cnfg,
     en_DRV8000_STST_t ret;
     un_DRV8000_Reg_t reg_data = drv8000_reg_map[REGID_HB_OUT_CNFG2];
 
-    if (DRV8000_REG_NOT_CHANGE != hhb_out1_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out1_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG2.OUT1_CNFG = hhb_out1_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out2_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out2_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG2.OUT2_CNFG = hhb_out2_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out3_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out3_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG2.OUT3_CNFG = hhb_out3_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out4_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out4_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG2.OUT4_CNFG = hhb_out4_cnfg;
     }
@@ -778,11 +778,11 @@ en_DRV8000_STST_t drv8000_hhb_out56_set_mode(en_HHB_CNFG_t hhb_out5_cnfg,
     en_DRV8000_STST_t ret;
     un_DRV8000_Reg_t reg_data = drv8000_reg_map[REGID_HB_OUT_CNFG1];
 
-    if (DRV8000_REG_NOT_CHANGE != hhb_out5_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out5_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG1.OUT5_CNFG = hhb_out5_cnfg;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out6_cnfg)
+    if (BITS_NOT_CHANGE != hhb_out6_cnfg)
     {
         reg_data.Reg_HB_OUT_CNFG1.OUT6_CNFG = hhb_out6_cnfg;
     }
@@ -808,27 +808,27 @@ en_DRV8000_STST_t drv8000_hhb_spi_enable(en_HHB_EN_t hhb_out1_en,
     en_DRV8000_STST_t ret;
     un_DRV8000_Reg_t reg_data = drv8000_reg_map[REGID_GD_HB_CTRL];
 
-    if (DRV8000_REG_NOT_CHANGE != hhb_out1_en)
+    if (BITS_NOT_CHANGE != hhb_out1_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT1_CTRL = hhb_out1_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out2_en)
+    if (BITS_NOT_CHANGE != hhb_out2_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT2_CTRL = hhb_out2_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out3_en)
+    if (BITS_NOT_CHANGE != hhb_out3_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT3_CTRL = hhb_out3_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out4_en)
+    if (BITS_NOT_CHANGE != hhb_out4_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT4_CTRL = hhb_out4_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out5_en)
+    if (BITS_NOT_CHANGE != hhb_out5_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT5_CTRL = hhb_out5_en;
     }
-    if (DRV8000_REG_NOT_CHANGE != hhb_out6_en)
+    if (BITS_NOT_CHANGE != hhb_out6_en)
     {
         reg_data.Reg_GD_HB_CTRL.OUT6_CTRL = hhb_out6_en;
     }
@@ -915,32 +915,32 @@ en_DRV8000_STST_t drv8000_hhb_set_itrip_lvl(en_HHB_ITRIP_t hhb_out1_itrip_lvl,
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT1_ITRIP_LVL = hhb_out1_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT1_ITRIP_EN = hhb_out1_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT1_ITRIP_EN = 1u;
     }
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT2_ITRIP_LVL = hhb_out2_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT2_ITRIP_EN = hhb_out2_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT2_ITRIP_EN = 1u;
     }
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT3_ITRIP_LVL = hhb_out3_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT3_ITRIP_EN = hhb_out3_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT3_ITRIP_EN = 1u;
     }
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT4_ITRIP_LVL = hhb_out4_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT4_ITRIP_EN = hhb_out4_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT4_ITRIP_EN = 1u;
     }
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT5_ITRIP_LVL = hhb_out5_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT5_ITRIP_EN = hhb_out5_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT5_ITRIP_EN = 1u;
     }
     if (HHB_ITRIP_DISABLE != hhb_out1_itrip_lvl)
     {
         reg_data.Reg_HB_ITRIP_CNFG.OUT6_ITRIP_LVL = hhb_out6_itrip_lvl;
-        reg_data.Reg_HB_ITRIP_CNFG.OUT6_ITRIP_EN = hhb_out6_itrip_en;
+        reg_data.Reg_HB_ITRIP_CNFG.OUT6_ITRIP_EN = 1u;
     }    
     
     return drv8000_spi_write(DRV8000_ADDREG_HB_ITRIP_CNFG,
@@ -1098,11 +1098,6 @@ en_DRV8000_STST_t drv8000_init(void)
     {
         ret = drv8000_spi_read(DRV8000_ADDREG_HS_HEAT_OUT_CNFG, 
                                 &drv8000_reg_map[REGID_HS_HEAT_OUT_CNFG]);
-    }
-    if (STST_SUCCESS == ret)
-    {
-        ret = drv8000_spi_read(DRV8000_ADDREG_HS_REG_CNFG2, 
-                                &drv8000_reg_map[REGID_HS_REG_CNFG2]);
     }
     if (STST_SUCCESS == ret)
     {
