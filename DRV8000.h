@@ -37,7 +37,7 @@
 /* **********************************************************************/
 #define DRV8000_REG_ADDRESS_MASK								0x3Fu
 #define DRV8000_REG_DATA_MASK									0xFFFFu
-#define DRV8000_GLOBAL_STATUS_MASK								0x3Fu       /* remove the first 2 bits (always 1) */
+#define DRV8000_GLOBAL_STATUS_MASK								0xFFu       /* first 2 bits (always 1) + 6-bit fault status */
 #define DRV8000_DEVICE_ID_MASK                                  0xFFu
 #define DRV8000_GEN_PWM_DC_MASK                                 0x3FFu      /* 10 bits */
 #define DRV8000_EC_V_TAR_MASK                                   0x3Fu       /* 6 bits */
@@ -45,27 +45,18 @@
 #define DRV8000_WRITE_ACCESS                                    0u
 #define DRV8000_READ_ACCESS                                     1u
 #define DRV8000_SPI_FRAME_LEN                                   4u          /* 24 bits + 8 bits padding = 4 8-bit buffers */
-#define DRV8000_SUCCESS_SPI_STATUS                              0x0u        /* 0     0    0     0   0    0       */
-                                                                            /* FAULT WARN OV_UV DRV OTSD SPI_ERR */
-#define DRV8000_REG_NOT_CHANGE                                  0x1FFFF     /* Flag for unchange bits, currently only for certain bitfields */
+#define DRV8000_SUCCESS_SPI_STATUS                              0xC0u       /* 1 1 0     0    0     0   0    0       */
+                                                                            /* 1 1 FAULT WARN OV_UV DRV OTSD SPI_ERR */
+#define DRV8000_REG_NOT_CHANGE                                  0x1FFFF     /* Flag for unchange bits, only for certain bitfields */
+#define PIN_LOW                                                 0u
+#define PIN_HIGH                                                1u
 
 
 /* **********************************************************************/
 /* ***               Definition of global types                       ***/
 /* **********************************************************************/
-typedef uint8_t (*DRV8000_SPI_Transceive_fptr)(const uint8_t*, uint8_t*, const uint16_t);
-typedef uint16_t (*DRV8000_Pwm_Set_Dutycycle_fptr)(uint8_t, uint8_t, uint16_t);
-typedef void (*DRV8000_Pwm_Set_Period_fptr)(uint8_t, uint8_t, uint16_t);
-typedef uint8_t (*DRV8000_GPIO_Set_fptr)(uint8_t, uint8_t, uint8_t);
-typedef void (*DRV8000_Delay_fptr)(uint16_t); /* Delay in us */
-
 typedef struct
 {
-    DRV8000_SPI_Transceive_fptr         fptr_SpiTransceive;
-    DRV8000_Pwm_Set_Period_fptr         fptr_PwmSetPeriod;
-    DRV8000_Pwm_Set_Dutycycle_fptr      fptr_PwmSetDutycycle;
-    DRV8000_GPIO_Set_fptr               fptr_Gpio;
-    DRV8000_Delay_fptr                  fptr_Delay;
     uint16_t pwm_max_period;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
@@ -79,16 +70,16 @@ typedef struct
     uint8_t pwm_gd_in1_instance;
     uint8_t pwm_gd_in1_channel;
 #ifdef GDU_GD_IN2_GPIO
-        uint8_t gd_in2_port;
-        uint8_t gd_in2_pin;
+    void* gd_in2_port;
+    uint8_t gd_in2_pin;
 #else /* not defined GDU_GD_IN2_GPIO */
-        uint8_t pwm_gd_in2_instance;
-        uint8_t pwm_gd_in2_channel;
+    uint8_t pwm_gd_in2_instance;
+    uint8_t pwm_gd_in2_channel;
 #endif /* GDU_GD_IN2_GPIO */
-    uint8_t drvoff_port;
+    void* drvoff_port;
     uint8_t drvoff_pin;
 #endif /* GDU_GD_USED */
-    uint8_t nsleep_port;
+    void* nsleep_port;
     uint8_t nsleep_pin;
 } st_DRV8000_Interface_t;
 
@@ -125,57 +116,23 @@ typedef union {
     uint32_t u32_SpiCommand;
 } un_DRV8000_SDI_FRAME_t;
 
-typedef enum {
-/* STATUS registers */
-    REGID_IC_STAT1                     ,
-    REGID_IC_STAT2                     ,
-    REGID_GD_STAT                      ,
-    REGID_HB_STAT1                     ,
-    REGID_HB_STAT2                     ,
-    REGID_EC_HEAT_ITRIP_STAT          ,
-    REGID_HS_STAT                      ,
-/* CONFIG registers */
-    REGID_IC_CNFG1                     ,
-    REGID_IC_CNFG2                     ,
-    REGID_GD_CNFG                      ,
-    REGID_GD_IDRV_CNFG                 ,
-    REGID_GD_VGS_CNFG                  ,
-    REGID_GD_VDS_CNFG                  ,
-    REGID_GD_CSA_CNFG                  ,
-    REGID_GD_AGD_CNFG                  ,
-    REGID_GD_PDR_CNFG                  ,
-    REGID_GD_STC_CNFG                  ,
-    REGID_HB_ITRIP_DG                  ,
-    REGID_HB_OUT_CNFG1                 ,
-    REGID_HB_OUT_CNFG2                 ,
-    REGID_HB_OCP_CNFG                  ,
-    REGID_HB_OL_CNFG1                  ,
-    REGID_HB_OL_CNFG2                  ,
-    REGID_HB_SR_CNFG                   ,
-    REGID_HB_ITRIP_CNFG                ,
-    REGID_HB_ITRIP_FREQ                ,
-    REGID_HS_HEAT_OUT_CNFG             ,
-    REGID_HS_OC_CNFG                   ,
-    REGID_HS_OL_CNFG                   ,
-    REGID_HS_REG_CNFG1                 ,
-    REGID_HS_REG_CNFG2                 ,
-    REGID_HS_PWM_FREQ_CNFG             ,
-    REGID_HEAT_CNFG                    ,
-    REGID_EC_CNFG                      ,
-    REGID_HS_OCP_DG                    ,
-/* CONTROL registers */
-    REGID_IC_CTRL                      ,
-    REGID_GD_HB_CTRL                   ,
-    REGID_HS_EC_HEAT_CTRL              ,
-    REGID_OUT7_PWM_DC                  ,
-    REGID_OUT8_PWM_DC                  ,
-    REGID_OUT9_PWM_DC                  ,
-    REGID_OUT10_PWM_DC                 ,
-    REGID_OUT11_PWM_DC                 ,
-    REGID_OUT12_PWM_DC                 ,
-
-    DRV8000_NUM_OF_REGS		           ,
-} en_REG_ID_t;
+typedef enum
+{
+    STST_SUCCESS,
+    
+    STST_SPI_ERR,
+    STST_GIO_ERR,
+    STST_PWM_ERR,
+    
+    STST_GDU_FAULT,
+    STST_GDU_WARN,
+    STST_GDU_UNKN_ERR,
+    STST_CTRL_REG_LOCKED,
+    STST_CNFG_REG_LOCKED,
+    
+    STST_WRONG_MODE,
+    STST_NULL_INTERFACE_PTR,
+} en_DRV8000_STST_t;
 
 typedef enum
 {
@@ -345,13 +302,9 @@ typedef enum
 {
     HS_CCM_200mA_20ms,
     HS_CCM_390mA_10ms,
-} en_HS_CCM_TO_t;
-
-typedef enum
-{
     HS_CCM_DISABLE,
-    HS_CCM_ENABLE,
-} en_HS_CCM_EN_t;
+    HS_CCM_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
+} en_HS_CCM_t;
 
 typedef enum
 {
@@ -377,9 +330,9 @@ typedef enum
 
 typedef enum
 {
-    HS_OUT7_ITRIP_BLK_0us  = 0x1u,
-    HS_OUT7_ITRIP_BLK_20us = 0x2u,
-    HS_OUT7_ITRIP_BLK_40us = 0x3u,
+    HS_OUT7_ITRIP_BLK_0us  = 1u,
+    HS_OUT7_ITRIP_BLK_20us = 2u,
+    HS_OUT7_ITRIP_BLK_40us = 3u,
 } en_HS_OUT7_ITRIP_BLK_t;
 
 typedef enum
@@ -424,6 +377,7 @@ typedef enum
     HEATER_CNFG_DISABLED,
     HEATER_CNFG_SPI_CONTROL,
     HEATER_CNFG_PWM_PIN_CONTROL,
+    HEATER_CNFG_REG_NOT_CHANGE = DRV8000_REG_NOT_CHANGE,
 } en_HEATER_CNFG_t;
 
 /* *** Electrochromic Driver Control *** */
@@ -599,13 +553,9 @@ typedef enum
     HHB_ITRIP_LVL_O6_2_25A   = 0u,
     HHB_ITRIP_LVL_O6_5_5A    = 1u,
     HHB_ITRIP_LVL_O6_6_25A   = 2u,
-} en_HHB_ITRIP_LVL_t;
 
-typedef enum
-{
-    HHB_ITRIP_DIS,
-    HHB_ITRIP_EN
-} en_HHB_ITRIP_EN_t;
+    HHB_ITRIP_DISABLE        = 3u,
+} en_HHB_ITRIP_t;
 
 typedef enum
 {
@@ -658,6 +608,78 @@ typedef enum
 /* ***            Declaration of global functions                     ***/
 /* **********************************************************************/
 /**
+ * @brief Transmits and receives data over SPI for the DRV8000 driver.
+ * 
+ * This function performs an SPI transaction by sending data from `tx_buffer` and receiving data into `rx_buffer`.
+ * 
+ * @note The user MUST implement this function to interface with the SPI hardware.
+ * @note The implementation of this function must ensure SPI timing requirements of the DRV8000.
+ *
+ * @param tx_buffer             Pointer to the buffer containing data to be transmitted.
+ * @param rx_buffer             Pointer to the buffer where received data will be stored.
+ * @param len                   Number of bytes to transmit and receive.
+ * @return uint8_t              SPI status code (0 = Success, non-zero = Error).
+ * 
+ * @warning The buffers must be valid, and `len` should not exceed the maximum SPI transaction size.
+ */
+extern uint8_t drv8000_spi_transceive(const uint8_t* tx_buffer,
+                                        uint8_t* rx_buffer,
+                                        const uint16_t len);
+
+/**
+ * @brief Set dutycycle for DRV8000 PWM channels
+ * 
+ * @note The user MUST implement this function to interface with the PWM hardware.
+ * 
+ * @param instance              PWM instance
+ * @param channel               PWM channel
+ * @param duty_cycle            PWM dutycycle
+ * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ */
+extern uint8_t drv8000_pwm_set_dc(uint8_t instance,
+                                    uint8_t channel,
+                                    uint16_t duty_cycle);
+
+#ifndef GDU_PWM_PERIOD_FIXED
+/**
+ * @brief Set period for DRV8000 PWM channels
+ * 
+ * @note The user MUST implement this function to interface with the PWM hardware.
+ * 
+ * @param instance              PWM instance
+ * @param channel               PWM channel
+ * @param period                PWM period
+ * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ */
+extern uint8_t drv8000_pwm_set_period(uint8_t instance,
+                                        uint8_t channel,
+                                        uint16_t period);
+#endif /* GDU_PWM_PERIOD_FIXED */
+
+/**
+ * @brief Control DRV8000 GPIO pins
+ * 
+ * @note The user MUST implement this function to interface with the GPIO hardware.
+ * 
+ * @param port                  GPIO port
+ * @param pin                   GPIO pin number
+ * @param pin_level             GPIO pin level (1 = High, 0 = Low)
+ * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ */
+extern uint8_t drv8000_gpio(void* port,
+                            uint8_t pin,
+                            uint8_t pin_level);
+
+/**
+ * @brief Blocking delay
+ * 
+ * @note The user MUST implement this function to interface with the hardware.
+ * 
+ * @param delay_us              Delay period in microseconds
+ */
+extern void drv8000_delay(uint16_t delay_us);
+
+/**
  * @brief Set the device interface
  * 
  * @param interface             Device control interface from microcontroller. (see `st_DRV8000_Interface_t` struct).
@@ -673,169 +695,171 @@ un_DRV8000_SPI_STST_t drv8000_spi_status_get(void);
 
 /* *** PIN Control *** */
 #ifdef GDU_GD_USED
-uint8_t drv8000_pin_gd_enable_disable(en_DRVOFF_t drvoff_en);
+en_DRV8000_STST_t drv8000_pin_gd_enable_disable(en_DRVOFF_t drvoff_en);
 #endif /* GDU_GD_USED */
 
-uint8_t drv8000_pin_set_pwm1(uint16_t dutycycle
+en_DRV8000_STST_t drv8000_pin_set_pwm1(uint16_t dutycycle
 #ifndef GDU_PWM_PERIOD_FIXED
-                            ,uint16_t period
+                                    ,uint16_t period
 #endif /* GDU_PWM_PERIOD_FIXED */
-                            );
+                                    );
 
 #ifdef GDU_PWM2_USED
-uint8_t drv8000_pin_set_pwm2(uint16_t dutycycle
+en_DRV8000_STST_t drv8000_pin_set_pwm2(uint16_t dutycycle
 #ifndef GDU_PWM_PERIOD_FIXED
-                            ,uint16_t period
+                                    ,uint16_t period
 #endif /* GDU_PWM_PERIOD_FIXED */
-                            );
+                                );
 #endif /* GDU_PWM2_USED */
 
-uint8_t drv8000_pin_set_gd_in1(uint16_t dutycycle
+en_DRV8000_STST_t drv8000_pin_set_gd_in1(uint16_t dutycycle
 #ifndef GDU_PWM_PERIOD_FIXED
-                              ,uint16_t period
+                                        ,uint16_t period
 #endif /* GDU_PWM_PERIOD_FIXED */
-                              );
+                                    );
 
 #ifndef GDU_GD_IN2_GPIO
-uint8_t drv8000_pin_set_gd_in2(uint16_t dutycycle
+en_DRV8000_STST_t drv8000_pin_set_gd_in2(uint16_t dutycycle
 #ifndef GDU_PWM_PERIOD_FIXED
-                              ,uint16_t period
+                                        ,uint16_t period
 #endif /* GDU_PWM_PERIOD_FIXED */
-                              );
+                                    );
 #endif /* GDU_GD_IN2_GPIO */
 
-uint8_t drv8000_sleep_wake(en_nSLEEP_t nsleep_en);
+en_DRV8000_STST_t drv8000_sleep_wake(en_nSLEEP_t nsleep_en);
 
-uint8_t drv8000_reset(void);
+en_DRV8000_STST_t drv8000_reset(void);
 
 /* *** SPI Read *** */
-uint8_t drv8000_read_status_registers(void);
+en_DRV8000_STST_t drv8000_read_ic_stat1_reg(un_DRV8000_Reg_t* reg_data);
 
-uint8_t drv8000_read_config_registers(void);
+en_DRV8000_STST_t drv8000_read_ic_stat2_reg(un_DRV8000_Reg_t* reg_data);
 
-uint8_t drv8000_read_control_registers(void);
+en_DRV8000_STST_t drv8000_read_hs_stat_reg(un_DRV8000_Reg_t* reg_data);
 
-uint8_t drv8000_read_registers(void);
+en_DRV8000_STST_t drv8000_read_ec_heat_itrip_stat_reg(un_DRV8000_Reg_t* reg_data);
 
-/**
- * @brief Read a DRV8000 register
- * 
- * @param reg_addr              Register address
- * @param reg_id                Register ID (see `en_REG_ID_t` enum).
- * @return int32_t              Register data, 16-bit. Returns -1 if SPI error occurred.
- */
-int32_t drv8000_read_single_register(const uint8_t reg_addr,
-                                     const uint8_t reg_id);
+en_DRV8000_STST_t drv8000_read_hb_stat1_reg(un_DRV8000_Reg_t* reg_data);
 
-int32_t drv8000_read_ic_stat1_reg(void);
+en_DRV8000_STST_t drv8000_read_hb_stat2_reg(un_DRV8000_Reg_t* reg_data);
 
-int32_t drv8000_read_ic_stat2_reg(void);
-
-int32_t drv8000_read_hs_stat_reg(void);
-
-int32_t drv8000_read_ec_heat_itrip_stat_reg(void);
-
-int32_t drv8000_read_hb_stat1_reg(void);
-
-int32_t drv8000_read_hb_stat2_reg(void);
-
-int32_t drv8000_read_gd_stat_reg(void);
+en_DRV8000_STST_t drv8000_read_gd_stat_reg(un_DRV8000_Reg_t* reg_data);
 
 uint8_t drv8000_read_devid(void);
 
 /* *** SPI Control *** */
-uint8_t drv8000_clear_fault(void);
+/**
+ * @brief Clear all fault flags from DRV8000
+ * 
+ * @return en_DRV8000_STST_t    Status code.
+ */
+en_DRV8000_STST_t drv8000_clear_fault(void);
 
-uint8_t drv8000_cfg_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
+en_DRV8000_STST_t drv8000_cfg_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
 
-uint8_t drv8000_ctrl_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
+en_DRV8000_STST_t drv8000_ctrl_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
 
-uint8_t drv8000_ipropi_mode(en_IPROPI_MODE_t ipropi_mode,
-                            en_IPROPI_SEL_MUX_t ipropi_sel);
+en_DRV8000_STST_t drv8000_ipropi_mode(en_IPROPI_MODE_t ipropi_mode,
+                                        en_IPROPI_SEL_MUX_t ipropi_sel);
 
-uint8_t drv8000_set_ic_cnfg1(en_OTSD_MODE_t otsd_mode,
-                             en_DIS_CP_t dis_cp,
-                             en_PVDD_OV_MODE_t pvdd_ov_mode,
-                             en_PVDD_OV_DG_t pvdd_ov_dg,
-                             en_PVDD_OV_LVL_t pvdd_ov_lvl,
-                             en_VCP_UV_LVL_t vcp_uv_lvl,
-                             en_CP_MODE_t cp_mode,
-                             en_VCP_UV_MODE_t vcp_uv_mode,
-                             en_PVDD_UV_MODE_t pvdd_uv_mode,
-                             en_WD_FLT_M_t wd_flt_mode,
-                             en_WD_WIN_t wd_window,
-                             en_EN_SSC_t en_ssc);
+en_DRV8000_STST_t drv8000_set_ic_cnfg1(en_OTSD_MODE_t otsd_mode, 
+                                        en_DIS_CP_t dis_cp, 
+                                        en_PVDD_OV_MODE_t pvdd_ov_mode, 
+                                        en_PVDD_OV_DG_t pvdd_ov_dg, 
+                                        en_PVDD_OV_LVL_t pvdd_ov_lvl, 
+                                        en_VCP_UV_LVL_t vcp_uv_lvl, 
+                                        en_CP_MODE_t cp_mode, 
+                                        en_VCP_UV_MODE_t vcp_uv_mode, 
+                                        en_PVDD_UV_MODE_t pvdd_uv_mode, 
+                                        en_WD_FLT_M_t wd_flt_mode, 
+                                        en_WD_WIN_t wd_window, 
+                                        en_EN_SSC_t en_ssc);
 
-uint8_t drv8000_wd_enable_disable(en_WD_EN_t wd_en);
+en_DRV8000_STST_t drv8000_wd_enable_disable(en_WD_EN_t wd_en);
 
-uint8_t drv8000_wd_trig(void);
+/**
+ * @brief Watchdog trigger
+ * 
+ * Trigger watchdog bit to restart the watchdog timer.
+ * Clear watchdog fault if occurred and restart timer.
+ * 
+ * @return en_DRV8000_STST_t    Status code.
+ */
+en_DRV8000_STST_t drv8000_wd_trig(void);
 
-/* ** High Side Driver Control ** */
+/**
+ * @brief Clear watchdog timer fault and restart watchdog timer
+ * 
+ * @return en_DRV8000_STST_t    Status code.
+ */
+en_DRV8000_STST_t drv8000_wd_fault_clear(void);
+
+/* ** High Side Driver and Heater Control ** */
 #ifdef GDU_HS_USED
-uint8_t drv8000_hs_driver_cnfg(en_HS_CNFG_t hs_out7_cnfg,
-                               en_HS_CNFG_t hs_out8_cnfg,
-                               en_HS_CNFG_t hs_out9_cnfg,
-                               en_HS_CNFG_t hs_out10_cnfg,
-                               en_HS_CNFG_t hs_out11_cnfg,
-                               en_HS_CNFG_t hs_out12_cnfg);
+en_DRV8000_STST_t drv8000_hs_driver_cnfg(en_HS_CNFG_t hs_out7_cnfg, 
+                                            en_HS_CNFG_t hs_out8_cnfg, 
+                                            en_HS_CNFG_t hs_out9_cnfg, 
+                                            en_HS_CNFG_t hs_out10_cnfg, 
+                                            en_HS_CNFG_t hs_out11_cnfg, 
+                                            en_HS_CNFG_t hs_out12_cnfg,
+                                            en_HEATER_CNFG_t hs_heater_cnfg);
 
-uint8_t drv8000_hs_driver_spi_enable(en_HS_EN_t hs_out7_en,
-                                     en_HS_EN_t hs_out8_en,
-                                     en_HS_EN_t hs_out9_en,
-                                     en_HS_EN_t hs_out10_en,
-                                     en_HS_EN_t hs_out11_en,
-                                     en_HS_EN_t hs_out12_en);
+en_DRV8000_STST_t drv8000_hs_driver_spi_enable(en_HS_EN_t hs_out7_en,
+                                                en_HS_EN_t hs_out8_en,
+                                                en_HS_EN_t hs_out9_en,
+                                                en_HS_EN_t hs_out10_en,
+                                                en_HS_EN_t hs_out11_en,
+                                                en_HS_EN_t hs_out12_en,
+                                                en_HS_EN_t hs_heater_en);
 
-uint8_t drv8000_hs_set_gen_pwm_dutycycle(en_HS_OUTx_t hs_outx,
-                                         uint16_t dutycycle);
+en_DRV8000_STST_t drv8000_hs_set_gen_pwm_dutycycle(en_HS_OUTx_t hs_outx,
+                                                    uint16_t dutycycle);
 
-uint8_t drv8000_hs_set_gen_pwm_freq(en_HS_GEN_PWM_FREQ_t hs_out7_pwm_freq,
-                                    en_HS_GEN_PWM_FREQ_t hs_out8_pwm_freq,
-                                    en_HS_GEN_PWM_FREQ_t hs_out9_pwm_freq,
-                                    en_HS_GEN_PWM_FREQ_t hs_out10_pwm_freq,
-                                    en_HS_GEN_PWM_FREQ_t hs_out11_pwm_freq,
-                                    en_HS_GEN_PWM_FREQ_t hs_out12_pwm_freq);
+en_DRV8000_STST_t drv8000_hs_set_gen_pwm_freq(en_HS_GEN_PWM_FREQ_t hs_out7_pwm_freq,
+                                                en_HS_GEN_PWM_FREQ_t hs_out8_pwm_freq,
+                                                en_HS_GEN_PWM_FREQ_t hs_out9_pwm_freq,
+                                                en_HS_GEN_PWM_FREQ_t hs_out10_pwm_freq,
+                                                en_HS_GEN_PWM_FREQ_t hs_out11_pwm_freq,
+                                                en_HS_GEN_PWM_FREQ_t hs_out12_pwm_freq);
 
 /**
  * @brief Enables or disables constant current mode (CCM) for high-side driver outputs
  * 
  * Enables or disables a constant current for a short duration to the desired high-side outputs.
  * 
- * @param hs_out7_ccm_en        High-side OUT7 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @param hs_out8_ccm_en        High-side OUT8 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @param hs_out9_ccm_en        High-side OUT9 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @param hs_out10_ccm_en       High-side OUT10 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @param hs_out11_ccm_en       High-side OUT11 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @param hs_out12_ccm_en       High-side OUT12 CCM enable bit (see `en_HS_CCM_EN_t` enum).
- * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ * @note Short circuit and over current detection are disabled during constant current mode
+ * @note CCM has to be enabled before enabling HS driver
+ * 
+ * @param hs_out7_ccm_en        High-side OUT7 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @param hs_out8_ccm_en        High-side OUT8 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @param hs_out9_ccm_en        High-side OUT9 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @param hs_out10_ccm_en       High-side OUT10 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @param hs_out11_ccm_en       High-side OUT11 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @param hs_out12_ccm_en       High-side OUT12 CCM enable bit (see `en_HS_CCM_t` enum).
+ * @return en_DRV8000_STST_t    Status code.
  */
-uint8_t drv8000_hs_enable_ccm(en_HS_CCM_EN_t hs_out7_ccm_en,
-                              en_HS_CCM_EN_t hs_out8_ccm_en,
-                              en_HS_CCM_EN_t hs_out9_ccm_en,
-                              en_HS_CCM_EN_t hs_out10_ccm_en,
-                              en_HS_CCM_EN_t hs_out11_ccm_en,
-                              en_HS_CCM_EN_t hs_out12_ccm_en);
-
-/* ** Heater Driver Control ** */
-uint8_t drv8000_heater_driver_cnfg(en_HEATER_CNFG_t hs_heater_cnfg);
-
-uint8_t drv8000_heater_driver_enable(en_HS_EN_t hs_heater_en);
+en_DRV8000_STST_t drv8000_hs_enable_ccm(en_HS_CCM_t hs_out7_ccm_en,
+                                        en_HS_CCM_t hs_out8_ccm_en,
+                                        en_HS_CCM_t hs_out9_ccm_en,
+                                        en_HS_CCM_t hs_out10_ccm_en,
+                                        en_HS_CCM_t hs_out11_ccm_en,
+                                        en_HS_CCM_t hs_out12_ccm_en);
 
 /* ** Electrochromic Driver Control ** */
-uint8_t drv8000_ec_driver_enable(en_HS_EN_t hs_ec_en,
-                                 en_EC_ECFB_LS_EN_t es_ecfb_ls_en,
-                                 uint8_t ec_v_tar);
+en_DRV8000_STST_t drv8000_ec_driver_enable(en_HS_EN_t hs_ec_en,
+                                            en_EC_ECFB_LS_EN_t es_ecfb_ls_en,
+                                            uint8_t ec_v_tar);
 
-uint8_t drv8000_ec_driver_cnfg(EC_ECFB_MAX_t ecfb_max_v,
-                               EC_OLEN_t ec_olen,
-                               EC_ECFB_LS_PWM_t ecfb_ls_pwm,
-                               EC_FLT_MODE_t ec_flt_mode,
-                               EC_ECFB_UV_OV_MODE_t ecfb_ov_mode,
-                               EC_ECFB_UV_OV_MODE_t ecfb_uv_mode,
-                               EC_ECFB_UV_OV_DG_t ecfb_ov_dg,
-                               EC_ECFB_UV_OV_DG_t ecfb_uv_dg,
-                               en_EC_ECFB_UV_TH_t ecfb_uv_th,
-                               en_EC_ECDRV_OL_EN_t ecdrv_ol_en);
+en_DRV8000_STST_t drv8000_ec_driver_cnfg(EC_ECFB_MAX_t ecfb_max_v,
+                                            EC_OLEN_t ec_olen,
+                                            EC_ECFB_LS_PWM_t ecfb_ls_pwm,
+                                            EC_FLT_MODE_t ec_flt_mode,
+                                            EC_ECFB_UV_OV_MODE_t ecfb_ov_mode,
+                                            EC_ECFB_UV_OV_MODE_t ecfb_uv_mode,
+                                            EC_ECFB_UV_OV_DG_t ecfb_ov_dg,
+                                            EC_ECFB_UV_OV_DG_t ecfb_uv_dg,
+                                            en_EC_ECFB_UV_TH_t ecfb_uv_th,
+                                            en_EC_ECDRV_OL_EN_t ecdrv_ol_en);
 #endif /* GDU_HS_USED */
 
 /* *** Half-bridge Control *** */
@@ -849,12 +873,12 @@ uint8_t drv8000_ec_driver_cnfg(EC_ECFB_MAX_t ecfb_max_v,
  * @param hhb_out2_cnfg         Half-bridge OUT2 configuration (see `en_HHB_CNFG_t` enum).
  * @param hhb_out3_cnfg         Half-bridge OUT3 configuration (see `en_HHB_CNFG_t` enum).
  * @param hhb_out4_cnfg         Half-bridge OUT4 configuration (see `en_HHB_CNFG_t` enum).
- * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ * @return en_DRV8000_STST_t    Status code.
  */
-uint8_t drv8000_hhb_out1234_set_mode(en_HHB_CNFG_t hhb_out1_cnfg,
-                                     en_HHB_CNFG_t hhb_out2_cnfg,
-                                     en_HHB_CNFG_t hhb_out3_cnfg,
-                                     en_HHB_CNFG_t hhb_out4_cnfg);
+en_DRV8000_STST_t drv8000_hhb_out1234_set_mode(en_HHB_CNFG_t hhb_out1_cnfg,
+                                                en_HHB_CNFG_t hhb_out2_cnfg,
+                                                en_HHB_CNFG_t hhb_out3_cnfg,
+                                                en_HHB_CNFG_t hhb_out4_cnfg);
 
 /**
  * @brief Configures the control mode of half-bridge outputs OUT5 and OUT6.
@@ -863,17 +887,17 @@ uint8_t drv8000_hhb_out1234_set_mode(en_HHB_CNFG_t hhb_out1_cnfg,
  * 
  * @param hhb_out5_cnfg         Half-bridge OUT5 configuration (see `en_HHB_CNFG_t` enum).
  * @param hhb_out6_cnfg         Half-bridge OUT6 configuration (see `en_HHB_CNFG_t` enum).
- * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ * @return en_DRV8000_STST_t    Status code.
  */
-uint8_t drv8000_hhb_out56_set_mode(en_HHB_CNFG_t hhb_out5_cnfg,
-                                   en_HHB_CNFG_t hhb_out6_cnfg);
+en_DRV8000_STST_t drv8000_hhb_out56_set_mode(en_HHB_CNFG_t hhb_out5_cnfg,
+                                                en_HHB_CNFG_t hhb_out6_cnfg);
 
-uint8_t drv8000_hhb_spi_enable(en_HHB_EN_t hhb_out1_en,
-                               en_HHB_EN_t hhb_out2_en,
-                               en_HHB_EN_t hhb_out3_en,
-                               en_HHB_EN_t hhb_out4_en,
-                               en_HHB_EN_t hhb_out5_en,
-                               en_HHB_EN_t hhb_out6_en);
+en_DRV8000_STST_t drv8000_hhb_spi_enable(en_HHB_EN_t hhb_out1_en,
+                                            en_HHB_EN_t hhb_out2_en,
+                                            en_HHB_EN_t hhb_out3_en,
+                                            en_HHB_EN_t hhb_out4_en,
+                                            en_HHB_EN_t hhb_out5_en,
+                                            en_HHB_EN_t hhb_out6_en);
 
 /**
  * @brief Configures the freewheeling control mode of half-bridge outputs.
@@ -887,48 +911,42 @@ uint8_t drv8000_hhb_spi_enable(en_HHB_EN_t hhb_out1_en,
  * @param hhb_out4_fw           Half-bridge OUT4 freewheeling configuration (see `en_HHB_FW_t` enum).
  * @param hhb_out5_fw           Half-bridge OUT5 freewheeling configuration (see `en_HHB_FW_t` enum).
  * @param hhb_out6_fw           Half-bridge OUT6 freewheeling configuration (see `en_HHB_FW_t` enum).
- * @return uint8_t              Status code (0 = Success, non-zero = Error).
+ * @return en_DRV8000_STST_t    Status code.
  */
-uint8_t drv8000_hhb_set_fw(en_HHB_FW_t hhb_out1_fw,
-                           en_HHB_FW_t hhb_out2_fw,
-                           en_HHB_FW_t hhb_out3_fw,
-                           en_HHB_FW_t hhb_out4_fw,
-                           en_HHB_FW_t hhb_out5_fw,
-                           en_HHB_FW_t hhb_out6_fw);
+en_DRV8000_STST_t drv8000_hhb_set_fw(en_HHB_FW_t hhb_out1_fw, 
+                                        en_HHB_FW_t hhb_out2_fw, 
+                                        en_HHB_FW_t hhb_out3_fw, 
+                                        en_HHB_FW_t hhb_out4_fw, 
+                                        en_HHB_FW_t hhb_out5_fw, 
+                                        en_HHB_FW_t hhb_out6_fw);
 
-uint8_t drv8000_hhb_set_ocp_dg(en_HHB_OCP_DG_t hhb_out1_ocp_dg,
-                               en_HHB_OCP_DG_t hhb_out2_ocp_dg,
-                               en_HHB_OCP_DG_t hhb_out3_ocp_dg,
-                               en_HHB_OCP_DG_t hhb_out4_ocp_dg,
-                               en_HHB_OCP_DG_t hhb_out5_ocp_dg,
-                               en_HHB_OCP_DG_t hhb_out6_ocp_dg);
+en_DRV8000_STST_t drv8000_hhb_set_ocp_dg(en_HHB_OCP_DG_t hhb_out1_ocp_dg, 
+                                            en_HHB_OCP_DG_t hhb_out2_ocp_dg, 
+                                            en_HHB_OCP_DG_t hhb_out3_ocp_dg, 
+                                            en_HHB_OCP_DG_t hhb_out4_ocp_dg, 
+                                            en_HHB_OCP_DG_t hhb_out5_ocp_dg, 
+                                            en_HHB_OCP_DG_t hhb_out6_ocp_dg);
 
-uint8_t drv8000_hhb_set_itrip_lvl(en_HHB_ITRIP_LVL_t hhb_out1_itrip_lvl,
-                                  en_HHB_ITRIP_LVL_t hhb_out2_itrip_lvl,
-                                  en_HHB_ITRIP_LVL_t hhb_out3_itrip_lvl,
-                                  en_HHB_ITRIP_LVL_t hhb_out4_itrip_lvl,
-                                  en_HHB_ITRIP_LVL_t hhb_out5_itrip_lvl,
-                                  en_HHB_ITRIP_LVL_t hhb_out6_itrip_lvl);
-
-uint8_t drv8000_hhb_set_itrip_en(en_HHB_ITRIP_EN_t hhb_out1_itrip_en,
-                                 en_HHB_ITRIP_EN_t hhb_out2_itrip_en,
-                                 en_HHB_ITRIP_EN_t hhb_out3_itrip_en,
-                                 en_HHB_ITRIP_EN_t hhb_out4_itrip_en,
-                                 en_HHB_ITRIP_EN_t hhb_out5_itrip_en,
-                                 en_HHB_ITRIP_EN_t hhb_out6_itrip_en);
+en_DRV8000_STST_t drv8000_hhb_set_itrip_lvl(en_HHB_ITRIP_t hhb_out1_itrip_lvl, 
+                                            en_HHB_ITRIP_t hhb_out2_itrip_lvl, 
+                                            en_HHB_ITRIP_t hhb_out3_itrip_lvl, 
+                                            en_HHB_ITRIP_t hhb_out4_itrip_lvl, 
+                                            en_HHB_ITRIP_t hhb_out5_itrip_lvl, 
+                                            en_HHB_ITRIP_t hhb_out6_itrip_lvl);
 #endif /* GDU_HHB_USED */
 
 /* *** H-bridge Control *** */
 #ifdef GDU_GD_USED
-uint8_t drv8000_spi_gd_enable_disable(en_GD_EN_t en_gd);
+en_DRV8000_STST_t drv8000_spi_gd_enable_disable(en_GD_EN_t en_gd);
 
-uint8_t drv8000_gd_hb_set_mode(en_GD_BRG_MODE_t brg_mode,
-                               en_GD_INx_MODE_t in1_spi_mode,
-                               en_GD_INx_MODE_t in2_spi_mode,
-                               en_GD_FBRG_FW_MODE_t fw_mode);
+en_DRV8000_STST_t drv8000_gd_hb_set_mode(en_GD_BRG_MODE_t brg_mode, 
+                                            en_GD_INx_MODE_t in1_spi_mode, 
+                                            en_GD_INx_MODE_t in2_spi_mode, 
+                                            en_GD_FBRG_FW_MODE_t fw_mode);
 
-uint8_t drv8000_gd_hb_set_direction(en_GD_FBRG_DIRECTION_t direction);
+uinten_CTRL_STST_t8_t drv8000_gd_hb_set_direction(en_GD_FBRG_DIRECTION_t direction);
 #endif /* GDU_GD_USED */
 
+en_DRV8000_STST_t drv8000_init(void);
 
-#endif /* GDU_TI_DRV8000_DRV8000_H_ */
+#endif /* GDU_DRV8000_H_ */
