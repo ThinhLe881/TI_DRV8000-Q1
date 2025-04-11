@@ -1,4 +1,4 @@
-# Texas Instruments - DRV8000-Q1 Embedded Driver
+# Texas Instruments - DRV8000-Q1 Multi-function Driver
 
 ## Introduction
 
