@@ -1140,10 +1140,12 @@ en_DRV8000_STST_t drv8000_init(st_DRV8000_Interface_t* interface)
     drv8000_interface = interface;
     ret = drv8000_reset();
     
-    if ((STST_SUCCESS == ret) && 
-        (drv8000_read_devid() == DRV8000_DEFVAL_DEVICE_ID))
+    if (STST_SUCCESS == ret)
     {
-        ret = STST_SPI_ERR;
+        if (drv8000_read_devid() != DRV8000_DEFVAL_DEVICE_ID)
+        {
+            ret = STST_SPI_ERR;
+        }
     }
     if (STST_SUCCESS == ret)
     {
