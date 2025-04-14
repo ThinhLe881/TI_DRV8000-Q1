@@ -47,6 +47,7 @@
 #define DRV8000_SPI_FRAME_LEN                                   4u          /* 24 bits + 8 bits padding = 4 8-bit buffers */
 #define DRV8000_SUCCESS_SPI_STATUS                              0xC0u       /* 1 1 0     0    0     0   0    0       */
                                                                             /* 1 1 FAULT WARN OV_UV DRV OTSD SPI_ERR */
+#define DRV8000_WATCHDOG_FAULT_STATUS                           0xE0u       /* 1 1 1     0    0     0   0    0       */         
 #define BITS_NOT_CHANGE                                         0x1FFFF     /* Flag for unchange bits, only for certain bitfields */
 #define PIN_LOW                                                 0u
 #define PIN_HIGH                                                1u
@@ -57,7 +58,6 @@
 /* **********************************************************************/
 typedef struct
 {
-    uint16_t pwm_max_period;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
 #ifdef GDU_HHB_USED
@@ -679,20 +679,6 @@ extern uint8_t drv8000_gpio(void* port,
  */
 extern void drv8000_delay(uint16_t delay_us);
 
-/**
- * @brief Set the device interface
- * 
- * @param interface             Device control interface from microcontroller. (see `st_DRV8000_Interface_t` struct).
- */
-void drv8000_interface_set(st_DRV8000_Interface_t* interface);
-
-/**
- * @brief Get the device SPI IC status
- * 
- * @return un_DRV8000_SPI_STST_t    Device IC status from SPI received frame (see `st_SpiCommStatus` struct).
- */
-un_DRV8000_SPI_STST_t drv8000_spi_status_get(void);
-
 /* *** PIN Control *** */
 #ifdef GDU_GD_USED
 en_DRV8000_STST_t drv8000_pin_gd_enable_disable(en_DRVOFF_t drvoff_en);
@@ -755,9 +741,8 @@ uint8_t drv8000_read_devid(void);
  */
 en_DRV8000_STST_t drv8000_clear_fault(void);
 
-en_DRV8000_STST_t drv8000_cfg_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
-
-en_DRV8000_STST_t drv8000_ctrl_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t reg_lock_unlock);
+en_DRV8000_STST_t drv8000_reg_lock_unlock(en_LOCK_UNLOCK_REG_WRITE_t cnfg_reg_lck_unlck,
+                                            en_LOCK_UNLOCK_REG_WRITE_t ctrl_reg_lck_unlck);
 
 en_DRV8000_STST_t drv8000_ipropi_mode(en_IPROPI_MODE_t ipropi_mode,
                                         en_IPROPI_SEL_MUX_t ipropi_sel);
@@ -773,9 +758,8 @@ en_DRV8000_STST_t drv8000_set_ic_cnfg1(en_OTSD_MODE_t otsd_mode,
                                         en_PVDD_UV_MODE_t pvdd_uv_mode, 
                                         en_WD_FLT_M_t wd_flt_mode, 
                                         en_WD_WIN_t wd_window, 
-                                        en_EN_SSC_t en_ssc);
-
-en_DRV8000_STST_t drv8000_wd_enable_disable(en_WD_EN_t wd_en);
+                                        en_EN_SSC_t en_ssc,
+                                        en_WD_EN_t wd_en);
 
 /**
  * @brief Watchdog trigger
@@ -786,13 +770,6 @@ en_DRV8000_STST_t drv8000_wd_enable_disable(en_WD_EN_t wd_en);
  * @return en_DRV8000_STST_t    Status code.
  */
 en_DRV8000_STST_t drv8000_wd_trig(void);
-
-/**
- * @brief Clear watchdog timer fault and restart watchdog timer
- * 
- * @return en_DRV8000_STST_t    Status code.
- */
-en_DRV8000_STST_t drv8000_wd_fault_clear(void);
 
 /* ** High Side Driver and Heater Control ** */
 #ifdef GDU_HS_USED
@@ -944,9 +921,19 @@ en_DRV8000_STST_t drv8000_gd_hb_set_mode(en_GD_BRG_MODE_t brg_mode,
                                             en_GD_INx_MODE_t in2_spi_mode, 
                                             en_GD_FBRG_FW_MODE_t fw_mode);
 
-uinten_CTRL_STST_t8_t drv8000_gd_hb_set_direction(en_GD_FBRG_DIRECTION_t direction);
+en_DRV8000_STST_t drv8000_gd_hb_set_direction(en_GD_FBRG_DIRECTION_t direction);
 #endif /* GDU_GD_USED */
 
-en_DRV8000_STST_t drv8000_init(void);
+en_DRV8000_STST_t drv8000_init(st_DRV8000_Interface_t* interface);
+
+/**
+ * @brief Get the device SPI IC status
+ * 
+ * @return un_DRV8000_SPI_STST_t    Device IC status from SPI received frame (see `st_SpiCommStatus` struct).
+ */
+un_DRV8000_SPI_STST_t drv8000_spi_status_get(void);
+
+en_DRV8000_STST_t drv8000_regs_periodic_read(void);
+
 
 #endif /* GDU_DRV8000_H_ */
