@@ -62,7 +62,7 @@ static en_DRV8000_STST_t drv8000_spi_read(const uint8_t reg_addr,
 static en_DRV8000_STST_t drv8000_spi_write(const uint8_t reg_addr,
                                             const un_DRV8000_Reg_t reg_val);
 
-static en_DRV8000_STST_t drv8000_gpio_set(void* port,
+static en_DRV8000_STST_t drv8000_gpio_set(const void* port,
                                             uint8_t pin,
                                             uint8_t pin_level);
 
@@ -1261,8 +1261,9 @@ static en_DRV8000_STST_t drv8000_spi_read(const uint8_t reg_addr,
     spi_transmit.st_SpiCommand.AccessType = DRV8000_READ_ACCESS;
     spi_transmit.st_SpiCommand.Address = reg_addr & DRV8000_REG_ADDRESS_MASK;
 
-    ret = (en_DRV8000_STST_t)drv8000_spi_transceive((uint8_t*)&spi_transmit,
-                                                    (uint8_t*)&spi_receive,
+    ret = (en_DRV8000_STST_t)drv8000_spi_transceive(drv8000_interface->spi_instance, 
+                                                    (uint8_t*)&spi_transmit, 
+                                                    (uint8_t*)&spi_receive, 
                                                     (uint16_t)DRV8000_SPI_FRAME_LEN);
 
     if (STST_SUCCESS == ret)
@@ -1317,8 +1318,9 @@ static en_DRV8000_STST_t drv8000_spi_write(const uint8_t reg_addr,
     spi_transmit.st_SpiCommand.Address = reg_addr & DRV8000_REG_ADDRESS_MASK;
     spi_transmit.st_SpiCommand.DataField = reg_val.u16_RegWord & DRV8000_REG_DATA_MASK;
 
-    ret = (en_DRV8000_STST_t)drv8000_spi_transceive((uint8_t*)&spi_transmit,
-                                                    (uint8_t*)&spi_receive,
+    ret = (en_DRV8000_STST_t)drv8000_spi_transceive(drv8000_interface->spi_instance, 
+                                                    (uint8_t*)&spi_transmit, 
+                                                    (uint8_t*)&spi_receive, 
                                                     (uint16_t)DRV8000_SPI_FRAME_LEN);
 
     if (STST_SUCCESS == ret)
@@ -1333,7 +1335,7 @@ static en_DRV8000_STST_t drv8000_spi_write(const uint8_t reg_addr,
     return ret;
 }
 
-static en_DRV8000_STST_t drv8000_gpio_set(void* port,
+static en_DRV8000_STST_t drv8000_gpio_set(const void* port,
                                             uint8_t pin,
                                             uint8_t pin_level)
 {

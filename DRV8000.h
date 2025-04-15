@@ -58,6 +58,7 @@
 /* **********************************************************************/
 typedef struct
 {
+    const void* spi_instance;
 	uint8_t pwm1_instance;
 	uint8_t pwm1_channel;
 #ifdef GDU_HHB_USED
@@ -70,16 +71,16 @@ typedef struct
     uint8_t pwm_gd_in1_instance;
     uint8_t pwm_gd_in1_channel;
 #ifdef GDU_GD_IN2_GPIO
-    void* gd_in2_port;
+    const void* gd_in2_port;
     uint8_t gd_in2_pin;
 #else /* not defined GDU_GD_IN2_GPIO */
-    uint8_t pwm_gd_in2_instance;
-    uint8_t pwm_gd_in2_channel;
+    const uint8_t pwm_gd_in2_instance;
+    const uint8_t pwm_gd_in2_channel;
 #endif /* GDU_GD_IN2_GPIO */
-    void* drvoff_port;
+    const void* drvoff_port;
     uint8_t drvoff_pin;
 #endif /* GDU_GD_USED */
-    void* nsleep_port;
+    const void* nsleep_port;
     uint8_t nsleep_pin;
 } st_DRV8000_Interface_t;
 
@@ -615,6 +616,7 @@ typedef enum
  * @note The user MUST implement this function to interface with the SPI hardware.
  * @note The implementation of this function must ensure SPI timing requirements of the DRV8000.
  *
+ * @param spi_instance          Pointer to the SPI hardware instance to be used for communication.
  * @param tx_buffer             Pointer to the buffer containing data to be transmitted.
  * @param rx_buffer             Pointer to the buffer where received data will be stored.
  * @param len                   Number of bytes to transmit and receive.
@@ -622,8 +624,9 @@ typedef enum
  * 
  * @warning The buffers must be valid, and `len` should not exceed the maximum SPI transaction size.
  */
-extern uint8_t drv8000_spi_transceive(const uint8_t* tx_buffer,
-                                        uint8_t* rx_buffer,
+extern uint8_t drv8000_spi_transceive(const void* spi_instance, 
+                                        const uint8_t* tx_buffer, 
+                                        uint8_t* rx_buffer, 
                                         const uint16_t len);
 
 /**
@@ -666,7 +669,7 @@ extern uint8_t drv8000_pwm_set_period(uint8_t instance,
  * @param pin_level             GPIO pin level (1 = High, 0 = Low)
  * @return uint8_t              Status code (0 = Success, non-zero = Error).
  */
-extern uint8_t drv8000_gpio(void* port,
+extern uint8_t drv8000_gpio(const void* port,
                             uint8_t pin,
                             uint8_t pin_level);
 
